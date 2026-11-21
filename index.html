@@ -1669,7 +1669,8 @@ const GAMES = {
     const goal = x - 160;
     const P = { x:80, y:380, vy:0, on:null, cp:80, cpy:380, jumps:0, star:0, boots:0, inv:0, jet:0, shield:0, combo:0, jetting:false }; let cam = 0, done = false; window.__platP = P; window.__segs = segs;
     const segAt = px => segs.find(s => px > s.x - 2 && px < s.x + s.w + 2);
-    const respawn = () => { P.x = P.cp; P.y = P.cpy - 60; P.vy = 0; P.jumps = 0; P.on = null; P.inv = 2; P.star = 0; P.boots = 0; P.jet = 0; P.combo = 0; bullets.length = 0; rainC.length = 0; rain = 0; plats.forEach(p => { if(p.crumble){ p.st = 0; p.gone = 0; } }); cam = Math.max(0, P.x - 260); };
+    const foeStart = foes.map(o => Object.assign({}, o)); window.__foes = foes;   /* enemies come back when Henry respawns */
+    const respawn = () => { foes.forEach((o, k) => { for(const kk in o) delete o[kk]; Object.assign(o, foeStart[k], { alive:true }); }); P.x = P.cp; P.y = P.cpy - 60; P.vy = 0; P.jumps = 0; P.on = null; P.inv = 2; P.star = 0; P.boots = 0; P.jet = 0; P.combo = 0; bullets.length = 0; rainC.length = 0; rain = 0; plats.forEach(p => { if(p.crumble){ p.st = 0; p.gone = 0; } }); cam = Math.max(0, P.x - 260); };
     let dead = 0;
     const burst = (bx, by, n, col, sp) => { for(let i = 0; i < n; i++){ const a = Math.random()*Math.PI*2, v = (sp || 160) * (.4 + Math.random()*.8); parts.push({ x:bx, y:by, vx:Math.cos(a)*v, vy:Math.sin(a)*v - 60, t:.5 + Math.random()*.4, c: col || `hsl(${Math.random()*360},90%,65%)` }); } };
     const banner = (txt, col) => banners.push({ txt, col: col || "#ffd34d", t:1.4 });
