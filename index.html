@@ -103,6 +103,12 @@ button:focus-visible{outline:4px solid var(--gold);outline-offset:3px}
 @keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 .pattern{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;font-size:clamp(2.2rem,9vw,3.6rem)}
 .pattern .q{width:1.3em;height:1.3em;border:4px dashed var(--gold);border-radius:14px;display:grid;place-items:center;font-size:.8em;color:var(--gold)}
+.pattern .q.solved{position:relative;font-size:1em;border:4px solid #3fd34a;background:rgba(63,211,74,.25);box-shadow:0 0 24px rgba(63,211,74,.7);animation:qpop .5s cubic-bezier(.3,1.7,.5,1)}
+.pattern .q.solved::after{content:"✔";position:absolute;top:-14px;right:-14px;font-size:1.1rem;background:#3fd34a;color:#fff;border:3px solid #fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center}
+@keyframes qpop{from{transform:scale(.2) rotate(-20deg)}70%{transform:scale(1.25)}}
+.pattern.done span{animation:qwave .6s ease-in-out}.pattern.done span:nth-child(2){animation-delay:.08s}.pattern.done span:nth-child(3){animation-delay:.16s}.pattern.done span:nth-child(4){animation-delay:.24s}.pattern.done span:nth-child(5){animation-delay:.32s}.pattern.done span:nth-child(6){animation-delay:.4s}
+@keyframes qwave{50%{transform:translateY(-14px) scale(1.12)}}
+.choices button.right{border-color:#3fd34a!important;background:rgba(63,211,74,.3)!important}.choices button.faded{opacity:.3}
 .choices{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 .choices button{font-size:clamp(2.4rem,10vw,3.6rem);background:var(--night-2);border:3px solid var(--line);border-radius:20px;width:clamp(84px,24vw,120px);aspect-ratio:1;max-width:100%}
 .choices button.wrong{animation:shake .3s;border-color:var(--holly)}
@@ -3956,7 +3962,13 @@ const PUZZLES = {
       const p = PATTERNS[r];
       el.innerHTML = `<p class="muted">Pattern ${r+1} of ${PATTERNS.length}</p><div class="pattern">${p.seq.map(x=>`<span>${x}</span>`).join("")}<span class="q">?</span></div><div class="choices">${shuffle(p.opts).map(o=>`<button data-o="${o}">${o}</button>`).join("")}</div>`;
       el.querySelectorAll("[data-o]").forEach(b => b.onclick = () => {
-        if(b.dataset.o === p.a){ tone(880,180,"triangle"); r++; if(r === PATTERNS.length) stepDone(); else draw(); }
+        if(b.dataset.o === p.a){
+          if(el.dataset.busy) return; el.dataset.busy = 1;
+          /* success: the answer drops into the ? spot, it glows green, the row lights up */
+          const q = el.querySelector(".pattern .q"); q.textContent = p.a; q.classList.add("solved"); b.classList.add("right");
+          el.querySelector(".pattern").classList.add("done"); el.querySelectorAll("[data-o]").forEach(x => { if(x !== b) x.classList.add("faded"); });
+          [660, 880, 1046].forEach((f, i) => setTimeout(() => tone(f, 140, "triangle"), i * 110)); sfx("correct", .6); burst();
+          r++; setTimeout(() => { delete el.dataset.busy; if(r === PATTERNS.length) stepDone(); else draw(); }, 1400); }
         else { b.classList.remove("wrong"); void b.offsetWidth; b.classList.add("wrong"); buzz(); sayAny("oops"); }
       });
     };
@@ -4211,7 +4223,7 @@ function treasureGlobe(inner){
       <text x="140" y="116" text-anchor="middle" font-size="16">👑</text></svg>
     ${sp}</div>`;
 }
-window.__treasure = (x) => treasureGlobe(x); window.__reward = (el) => treasureReward(el); window.__finale = (el) => PUZZLES.finale(el); window.__winTest = () => { S.step = STEPS.length - 1; S.done = true; S.newSong = unlockSong(S.bossKey) || true; render(); };
+window.__treasure = (x) => treasureGlobe(x); window.__reward = (el) => treasureReward(el); window.__finale = (el) => PUZZLES.finale(el); window.__puz = (k, el) => PUZZLES[k](el, {}); window.__winTest = () => { S.step = STEPS.length - 1; S.done = true; S.newSong = unlockSong(S.bossKey) || true; render(); };
 function renderWin(){
   const b = boss(), { g, right } = guessInfo();
   document.body.classList.add("kidmode");
