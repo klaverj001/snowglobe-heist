@@ -2387,10 +2387,10 @@ const GAMES = {
     /* match-3. The vault keys are frozen in ice blocks you can SEE. Make matches right next to a block to smash it and free the key.
        Extras: a cascade of 3+ gives +1 move, a big key reveal, and a SUGAR RUSH finale where leftover moves turn into blasts */
     const C = 7, R = 7, TS = 58, GX = 262, GY = 30;
-    const TYPES = ["🍬","🍭","🍩","🧁","🍪","🍫"].slice(0, DF() < 1 ? 5 : 6);
+    const TYPES = ["🍬","🍭","🍩","🧁","🍪","🍫"].slice(0, DF() > 1 ? 5 : 4);   /* fewer kinds = more matches and chain reactions */
     const TCOL = ["#ff5fa2","#b06aff","#ff9a3a","#4fc3ff","#ffd34d","#8a4a2a"];
     const PRAISE = ["SWEET!","YUMMY!","SUGAR RUSH!","MEGA MUNCH!","UNSTOPPABLE!"];
-    const NK = DF() > 1 ? 3 : 2, BHP = DF() > 1 ? 2 : 1; let moves = DF() < 1 ? 26 : DF() > 1 ? 22 : 24;
+    const NK = DF() < 1 ? 2 : DF() > 1 ? 4 : 3, BHP = 2; let moves = DF() < 1 ? 26 : DF() > 1 ? 22 : 24;
     const cx = c => GX + c * TS + TS/2, cy = r => GY + r * TS + TS/2;
     const B = Array.from({ length: R }, () => Array(C).fill(null)), lock = Array.from({ length: R }, () => Array(C).fill(0));
     let found = 0, keyPop = null, sel = null, state = "idle", stateT = 0, combo = 0, idleT = 0, hint = null, flyKeys = [], parts = [], banner = null, bannerT = 0, swapA = null, swapB = null, beams = [], tut = 0, moved = false, api_ = null;
@@ -2463,7 +2463,11 @@ const GAMES = {
     };
     const settled = () => B.every((row, r) => row.every((tl, c) => !tl || (Math.abs(tl.x - cx(c)) < 1 && Math.abs(tl.y - cy(r)) < 1)));
     const gravity = () => { for(let c = 0; c < C; c++){ const col = []; for(let r = R - 1; r >= 0; r--) if(B[r][c] && !B[r][c].die && !fixed(r, c)) col.push(B[r][c]);
-        let spawnY = GY - TS/2, i = 0; for(let r = R - 1; r >= 0; r--){ if(fixed(r, c)) continue; if(i < col.length) B[r][c] = col[i++]; else { spawnY -= TS; B[r][c] = mk(r, c, null, spawnY); } } } };
+        let spawnY = GY - TS/2, i = 0; for(let r = R - 1; r >= 0; r--){ if(fixed(r, c)) continue; if(i < col.length) B[r][c] = col[i++]; else { spawnY -= TS;
+            /* lucky refills: new sweets often copy a neighbour, so falling sweets set off combos */
+            const nb = [B[r + 1] && B[r + 1][c], B[r][c - 1], B[r][c + 1]].filter(x => x && !x.die && x.t >= 0);
+            const t = nb.length && Math.random() < .35 ? nb[Math.floor(Math.random() * nb.length)].t : null;
+            B[r][c] = mk(r, c, t, spawnY); } } } };
     const reshuffle = () => { for(let tries = 0; tries < 30; tries++){ for(let r = 0; r < R; r++) for(let c = 0; c < C; c++) if(B[r][c] && !B[r][c].block && !B[r][c].sp) B[r][c].t = rnd(); if(!runs().length && moveList().length) break; } B.forEach(row => row.forEach(tl => { if(tl && !tl.block) tl.sq = .3; })); };
     const trySwap = (a, b2, api) => {
       const A = B[a[0]][a[1]], Bt = B[b2[0]][b2[1]];
