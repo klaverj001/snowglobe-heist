@@ -1615,7 +1615,7 @@ function levelHost(el, key, def, onWin){
 const GAMES = {
   platform(key, sk){
     sk = Object.assign({ foe:"⛄", gift:"🎁", goal:"🏰", sky:["#0b1430","#1d2d55"], gtop:"#f4f8fc", gbody:"#7a4a2a", plat:"#b5552a", grav:1 }, sk);
-    const G = 1500 * sk.grav, J = -640 * Math.sqrt(sk.grav) * (sk.grav < 1 ? 1.05 : 1);
+    const G = 1500 * sk.grav, J = -600 * Math.sqrt(sk.grav) * (sk.grav < 1 ? 1.05 : 1);
     const segs = [], plats = [], foes = [], gifts = [], blocks = [], springs = [], pops = [], fireworks = [], spikes = [], cannons = [], bullets = [], flags = [];
     /* juice: pop-up texts in the world, big screen banners, particles, falling rain coins */
     const texts = [], banners = [], parts = [], rainC = []; let shake = 0, rain = 0;
@@ -1624,7 +1624,8 @@ const GAMES = {
     let x = 0, h = 380;
     const clampH = v => Math.max(250, Math.min(390, v));
     const seg = (w, top) => { top = top == null ? h : top; segs.push({ x, w, top }); const s = x; x += w; return s; };
-    const gap = w => { x += Math.round(w * Math.min(1.12, Math.sqrt(DF()))); };
+    const GK = DF() < 1 ? 1.25 : DF() > 1 ? 1.9 : 1.6;   /* wider gaps: a single jump needs good timing, the double jump is the safety net */
+    const gap = w => { x += Math.round(w * GK); };
     const walker = (sx, w, top, dir) => foes.push({ type:"walk", x: sx + w/2, top, dir: dir || -1, min: sx + 30, max: sx + w - 30, alive:true });
     const hopper = (fx, top) => foes.push({ type:"hop", x: fx, top, vy:0, y: top, t: Math.random()*2, alive:true });
     const flyer = (fx, base) => foes.push({ type:"fly", x: fx, base, t: Math.random()*6, alive:true });
@@ -1638,14 +1639,14 @@ const GAMES = {
       hoppers(){ h = clampH(h + 60); const s = seg(600); hopper(s + 200, h); hopper(s + 420, h); arc(s + 60, s + 560, h - 50, 6, 70); gap(90); },
       springGifts(){ const s = seg(540); springs.push({ x: s + 90, top: h }); plats.push({ x: s + 150, y: h - 240, w: 220, move:0 });
         for(let g = 0; g < 5; g++) gift(s + 170 + g*42, h - 280); flyer(s + 420, h - 120); gap(100); },
-      stepping(){ seg(200); x += 70; const hs = [h - 30, h - 70, h - 30, h - 80];
-        hs.forEach((y, i) => { plats.push({ x, y, w: 110, move:0 }); gift(x + 55, y - 45); x += 110 + (i < 3 ? 75 : 0); }); x += 80; },
+      stepping(){ seg(200); x += Math.round(70 * GK); const hs = [h - 30, h - 70, h - 30, h - 80];
+        hs.forEach((y, i) => { plats.push({ x, y, w: 110, move:0 }); gift(x + 55, y - 45); x += 110 + (i < 3 ? Math.round(75 * GK) : 0); }); x += Math.round(80 * GK); },
       bridge(){ const s = seg(260); x += 30; plats.push({ x: x + 10, y: Math.min(h, 340) - 20, w: 120, move: 1, base: x + 10, range: 90, t: Math.random()*6 }); arc(x, x + 240, h - 80, 3); x += 270; },
       spikes(){ const s = seg(780); spikes.push({ x: s + 220, w: 70, top: h }, { x: s + 500, w: 90, top: h });
         arc(s + 190, s + 320, h - 70, 3, 60); arc(s + 470, s + 620, h - 70, 3, 60); flyer(s + 640, h - 130); gap(90); },
       flyers(){ const s = seg(720); flyer(s + 200, h - 110); flyer(s + 400, h - 150); flyer(s + 600, h - 100); for(let g = 0; g < 7; g++) gift(s + 100 + g*85, h - 30); gap(90); },
       pillars(){ const tops = [h, h - 50, h - 100, h - 40].map(clampH); tops.forEach((tp, i) => { const s = seg(100, tp); gift(s + 50, tp - 45); if(i < 3) gap(85); }); h = tops[3]; gap(90); },
-      crumble(){ seg(220); x += 60; for(let i = 0; i < 4; i++){ plats.push({ x, y: h - 20 - (i % 2) * 40, w: 100, move:0, crumble:true, st:0, gone:0 }); gift(x + 50, h - 70 - (i % 2) * 40); x += 100 + 60; } x += 20; },
+      crumble(){ seg(220); x += 60; for(let i = 0; i < 4; i++){ plats.push({ x, y: h - 20 - (i % 2) * 40, w: 100, move:0, crumble:true, st:0, gone:0 }); gift(x + 50, h - 70 - (i % 2) * 40); x += 100 + Math.round(60 * GK); } x += 20; },
       cannon(){ const s = seg(820); cannons.push({ x: s + 780, top: h, t: 1 }); blocks.push({ x: s + 300, y: h - 130, used:false, prize:"coin" }, { x: s + 348, y: h - 130, used:false, prize: Math.random() < .5 ? "jet" : "shield" });
         walker(s, 500, h, 1); arc(s + 450, s + 700, h - 40, 4, 30); gap(90); },
       lift(){ h = 380; const s = seg(300); const hi = clampH(h - 170); x += 20;
@@ -1705,7 +1706,7 @@ const GAMES = {
         if(P.on && P.on.move) P.x += P.on.dx || 0;
         if(P.on && P.on.vmove) P.y += P.on.dy || 0;
         P.air = P.on ? 0 : (P.air || 0) + dt;
-        if(inp.pressed.jump || inp.taps.length){ if(P.on || (P.jumps === 0 && P.air < .16)){ P.vy = J; P.on = null; P.jumps = 1; api.sfx("jump", .5); } else if(P.jumps < 2){ P.vy = J * .85; P.jumps = 2; api.sfx("speed", .45); } }
+        if(inp.pressed.jump || inp.taps.length){ if(P.on || (P.jumps === 0 && P.air < .16)){ P.vy = J; P.on = null; P.jumps = 1; api.sfx("jump", .5); } else if(P.jumps < 2){ P.vy = J * .7; P.jumps = 2; api.sfx("speed", .45); } }
         /* jetpack: hold A to fly up */
         P.jetting = false;
         if(P.jet > 0 && inp.held.jump && !P.on){ P.jetting = true; P.vy = Math.max(-340, P.vy - 3300*dt); if(Math.random() < dt * 5) api.sfx("whoosh", .18, 1.4);
