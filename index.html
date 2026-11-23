@@ -401,6 +401,16 @@ body.kidmode .wrap{max-width:none;padding-block:8px;height:100dvh;height:calc(10
 .winplay{width:clamp(110px,18vw,150px)!important;height:clamp(110px,18vw,150px)!important;font-size:clamp(3.4rem,9vw,5rem)!important;flex:none}
 .newsong .vinyl{width:110px;height:110px}
 .su-go{max-width:0;padding:12px 0!important;margin:0;border-width:0!important;opacity:0;overflow:hidden;white-space:nowrap;transition:max-width .5s cubic-bezier(.3,1.3,.5,1),padding .5s,margin .5s,opacity .3s;flex:none}.su-go.show{max-width:220px;padding:12px 30px!important;margin-left:24px;border-width:5px!important;opacity:1}.su-go.show{transform:scale(1)}
+.fin-stage{display:flex;justify-content:center;width:100%;padding-top:min(22vh,170px);overflow:hidden;min-height:76vh}
+.fin-lift{position:relative;display:flex;flex-direction:column;align-items:center;transition:transform 1s cubic-bezier(.3,1.3,.5,1)}
+.fin-lift.up{transform:translateY(-24px) scale(1.04)}
+.fin-boss{position:absolute;z-index:3;top:calc(-1 * min(26vw,140px) - 6px);left:50%;width:min(26vw,140px);height:min(26vw,140px);border-radius:50%;border:5px solid #f2c14e;box-shadow:0 10px 24px rgba(0,0,0,.5);transform:translate(-50%,0) translateX(-75vw) rotate(-40deg);transition:transform .9s cubic-bezier(.3,1.3,.5,1)}
+.fin-boss .fw,.fin-boss .portrait{width:100%;height:100%;display:block;border-radius:50%;overflow:hidden}
+.fin-boss.in{transform:translate(-50%,0) translateX(0) rotate(0)}
+.fin-boss.grab{animation:fgrab .5s ease-out}@keyframes fgrab{40%{transform:translate(-50%,24px) scale(1.12)}100%{transform:translate(-50%,0)}}
+.fin-hands{position:absolute;left:50%;bottom:-26px;transform:translateX(-50%);font-size:2.4rem;opacity:0;transition:opacity .3s}.fin-boss.grab .fin-hands{opacity:1}
+.mg-boss{position:absolute;z-index:3;left:50%;top:-50px;transform:translateX(-50%);width:54px;height:54px;border-radius:50%;border:3px solid #f2c14e;overflow:hidden;display:block}
+.mg-boss .fw,.mg-boss .portrait{width:100%;height:100%;display:block}
 .fxcanvas{position:fixed;inset:0;width:100vw;height:100vh;pointer-events:none;z-index:60}
 .coinrain{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:4}
 .chestwrap{position:relative;width:min(60vw,290px);cursor:pointer;transition:width .5s ease,margin .5s ease;margin-top:6vh;z-index:1}
@@ -3977,19 +3987,26 @@ const PUZZLES = {
   action(el, st){ levelHost(el, S.bossKey, THEMES[S.bossKey][st.lv], () => stepDone()); },
   final(el){ levelHost(el, S.bossKey, { kind:"final", sk:{ fire:"💥 FIRE" } }, () => stepDone()); },
   finale(el){
-    el.innerHTML = `<button id="globe" style="background:none;display:flex;flex-direction:column;align-items:center;padding-top:20px" aria-label="Grab the snowglobe">${treasureGlobe("🎄")}</button><p style="font-family:var(--display);font-size:2rem;margin-top:10px">👆 ✨</p>`;
-    let shimmer = setInterval(() => { if(!document.getElementById("globe")) return clearInterval(shimmer); tone(1200 + Math.random() * 900, 80, "sine", .03); }, 900);
-    document.getElementById("globe").onclick = (e) => {
-      const g = e.currentTarget; if(g.dataset.cast) return; g.dataset.cast = 1;
-      clearInterval(shimmer); sfx("powerup", .9); jingle();
+    /* one big animation, no tapping: the boss swoops in, grabs the snowglobe, it activates and summons the treasure chest */
+    const b = boss();
+    el.innerHTML = `<div class="fin-stage"><div class="fin-lift" id="flift"><div class="fin-boss" id="fboss" style="background:${b.hex}">${face(b)}<span class="fin-hands" aria-hidden="true">🙌</span></div>
+      <div id="globe">${treasureGlobe("🎄")}</div></div></div>`;
+    const g = document.getElementById("globe"), lift = document.getElementById("flift"), fb = document.getElementById("fboss");
+    let shimmer = setInterval(() => { if(!document.getElementById("globe")) return clearInterval(shimmer); tone(1200 + Math.random() * 900, 80, "sine", .03); }, 700);
+    setTimeout(() => { fb.classList.add("in"); sfx("whoosh", .8); }, 900);
+    setTimeout(() => { fb.classList.add("grab"); sfx("stomp", .6); sfx("powerup", .5); }, 1800);
+    setTimeout(() => { lift.classList.add("up"); sfx("speed", .6); jingle(); }, 2300);
+    setTimeout(() => {
+      clearInterval(shimmer); sfx("powerup", .9);
       /* the snowglobe's magic wakes up: it shakes, glows and swirls sparkles */
       g.querySelector(".tglobe").classList.add("casting");
       const cfx = makeFX(); const gr = () => { const r = g.querySelector(".torb").getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, r: r.width / 2 }; };
       let k = 0; const sw = setInterval(() => { const c = gr(); cfx.swirl(c.x, c.y, c.r * 1.1, 14); if(++k % 3 === 0) tone(700 + k * 60, 70, "sine", .05); }, 90);
       setTimeout(() => { const c = gr(); cfx.ring(c.x, c.y, "#c8a0ff", 260); cfx.spark(c.x, c.y, 80, 500); sfx("boom", .5); }, 1300);
-      setTimeout(() => { clearInterval(sw); cfx.stop(); treasureReward(el); }, 1500);
-    };
+      setTimeout(() => { clearInterval(sw); cfx.stop(); treasureReward(el, true); }, 1500);
+    }, 3300);
   }
+
 };
 function choiceWire(el, right){
   el.querySelectorAll("[data-o]").forEach(b => b.onclick = () => {
@@ -4069,7 +4086,7 @@ function makeFX(){
 }
 
 /* grabbing the snowglobe: a shower of treasure coins, then Henry picks one prize */
-function treasureReward(el){
+function treasureReward(el, auto){
   const b = boss(), COINS = DF() < 1 ? 40 : DF() > 1 ? 90 : 60, BAG = DF() < 1 ? 30 : DF() > 1 ? 60 : 45;
   const unowned = HATS.filter(h => !WAL.owned.includes(h.id)), pickOne = arr => arr.length ? arr[Math.floor(Math.random() * arr.length)] : null;
   /* offer something nice: from the fancier half of what he doesn't own yet */
@@ -4077,7 +4094,7 @@ function treasureReward(el){
   const hat = pickOne(fancy(unowned.filter(h => !h.mask))), mask = pickOne(fancy(unowned.filter(h => h.mask)));
   const opts = [hat && { k:"hat", h:hat }, mask && { k:"mask", h:mask }, { k:"bag" }].filter(Boolean);
   /* first a treasure chest: tap it 3 times to burst it open */
-  el.innerHTML = `<div class="treasure-rw"><div class="miniglobe" id="mglobe">${treasureGlobe("🎄")}</div><div class="magicbeam" id="mbeam"></div><div class="chestwrap summon" id="chw"><div class="chray"></div>
+  el.innerHTML = `<div class="treasure-rw"><div class="miniglobe" id="mglobe"><span class="mg-boss" style="background:${b.hex}">${face(b)}</span>${treasureGlobe("🎄")}</div><div class="magicbeam" id="mbeam"></div><div class="chestwrap summon" id="chw"><div class="chray"></div>
       <svg class="chest" id="chest" viewBox="0 0 220 190" aria-label="Treasure chest"><defs>
         <linearGradient id="cw" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#b8632a"/><stop offset="1" stop-color="#6a3410"/></linearGradient>
         <linearGradient id="cg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff2a8"/><stop offset=".5" stop-color="#f2c14e"/><stop offset="1" stop-color="#a8701a"/></linearGradient></defs>
@@ -4100,6 +4117,7 @@ function treasureReward(el){
   const gpos = () => { const r = document.querySelector("#mglobe .torb").getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; };
   setTimeout(() => { const g = gpos(), c = cpos(); fx.stream(g.x, g.y, c.x, c.y, 70); sfx("powerup", .8); }, 150);
   setTimeout(() => { const c = cpos(); fx.ring(c.x, c.y, "#c8a0ff", 220); fx.ring(c.x, c.y, "#7fd8ff", 300); fx.spark(c.x, c.y, 90, 520); sfx("popup", .9); sfx("unlock", .5); }, 750);
+  if(auto){ const ct = document.getElementById("chtaps"); if(ct) ct.style.visibility = "hidden"; [1500, 1900, 2300].forEach(ms => setTimeout(() => { if(!opened && document.getElementById("chw")) chw.onclick(); }, ms)); }
   const trickle = setInterval(() => { if(!document.getElementById("mglobe") || opened) return clearInterval(trickle); const g = gpos(), c = cpos(); fx.stream(g.x, g.y, c.x, c.y, 6); }, 400);
   const cpos = () => { const r = document.getElementById("chest").getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height * .5 }; };
   chw.onclick = () => {
