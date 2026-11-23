@@ -2621,13 +2621,22 @@ const GAMES = {
           blast(set); state = "clear"; stateT = 0; });
       },
       draw(ctx, t){
-        const g = ctx.createLinearGradient(0,0,0,LH); g.addColorStop(0, "#2a1446"); g.addColorStop(1, "#120a24"); ctx.fillStyle = g; ctx.fillRect(0,0,LW,LH);
+        const g = ctx.createLinearGradient(0,0,0,LH); g.addColorStop(0, "#4a2a7a"); g.addColorStop(1, "#24143e"); ctx.fillStyle = g; ctx.fillRect(0,0,LW,LH);
         const shx = shakeB ? (Math.random()-.5) * 12 * shakeB / .5 : 0; ctx.save(); ctx.translate(shx, 0);
-        ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fillRect(GX - 8, GY - 8, C*TS + 16, R*TS + 16);
-        for(let r = 0; r < R; r++) for(let c = 0; c < C; c++){ ctx.fillStyle = (r + c) % 2 ? "rgba(255,255,255,.06)" : "rgba(255,255,255,.12)"; ctx.fillRect(GX + c*TS, GY + r*TS, TS, TS); }
+        const rr = (x, y, w, h, rad) => { ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(x, y, w, h, rad); else ctx.rect(x, y, w, h); };
+        ctx.fillStyle = "rgba(255,255,255,.16)"; rr(GX - 10, GY - 10, C*TS + 20, R*TS + 20, 22); ctx.fill();
+        ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 3; ctx.stroke();
+        for(let r = 0; r < R; r++) for(let c = 0; c < C; c++){ ctx.fillStyle = (r + c) % 2 ? "rgba(20,10,40,.35)" : "rgba(20,10,40,.22)"; rr(GX + c*TS + 2, GY + r*TS + 2, TS - 4, TS - 4, 12); ctx.fill(); }
+        /* groups you can pop are joined by coloured bridges, so he can see them */
+        const sameAt = (r, c, r2, c2) => inB(r2, c2) && B[r][c] && B[r2][c2] && !B[r][c].block && !B[r2][c2].block && !B[r][c].die && !B[r2][c2].die && B[r][c].t >= 0 && B[r][c].t === B[r2][c2].t
+          && Math.abs(B[r][c].y - cy(r)) < 2 && Math.abs(B[r2][c2].y - cy(r2)) < 2;
+        for(let r = 0; r < R; r++) for(let c = 0; c < C; c++){ const tl = B[r][c]; if(!tl || tl.block || tl.t < 0) continue;
+          ctx.fillStyle = TCOL[tl.t] + "aa";
+          if(sameAt(r, c, r, c + 1)){ rr(cx(c), cy(r) - 13, TS, 26, 13); ctx.fill(); }
+          if(sameAt(r, c, r + 1, c)){ rr(cx(c) - 13, cy(r), 26, TS, 13); ctx.fill(); } }
         /* glow on the squares next to a key block: match here! */
-        const pulse = .28 + .18 * Math.sin(t * 5);
-        for(let r = 0; r < R; r++) for(let c = 0; c < C; c++) if(isBlock(r, c) && !B[r][c].die) [[1,0],[-1,0],[0,1],[0,-1]].forEach(([a, b]) => { if(inB(r + a, c + b) && !isBlock(r + a, c + b)){ ctx.fillStyle = `rgba(255,220,90,${pulse})`; ctx.fillRect(GX + (c+b)*TS + 2, GY + (r+a)*TS + 2, TS - 4, TS - 4); } });
+        const pulse = .55 + .4 * Math.sin(t * 5), nextToIce = [];
+        for(let r = 0; r < R; r++) for(let c = 0; c < C; c++) if(isBlock(r, c) && !B[r][c].die) [[1,0],[-1,0],[0,1],[0,-1]].forEach(([a, b]) => { if(inB(r + a, c + b) && !isBlock(r + a, c + b)){ nextToIce.push([r + a, c + b]); } });
         ctx.save(); ctx.beginPath(); ctx.rect(GX - 8, GY - 4, C*TS + 16, R*TS + 12); ctx.clip();
         B.forEach((row, r) => row.forEach((tl, c) => { if(!tl) return;
           if(tl.block){ if(tl.die) return; const sx = tl.shake ? (Math.random()-.5) * 8 : 0, x = tl.x + sx, y = tl.y;
@@ -2642,13 +2651,17 @@ const GAMES = {
           let wx = 0; if(hint && hint.some(h => h[0] === r && h[1] === c)) wx = Math.sin(t*14) * 5;
           const isSel = sel && sel[0] === r && sel[1] === c; if(isSel){ ctx.fillStyle = "rgba(255,230,120,.45)"; ctx.fillRect(cx(c) - TS/2 + 2, cy(r) - TS/2 + 2, TS - 4, TS - 4); s *= 1.1 + Math.sin(t*10)*.05; }
           ctx.save(); ctx.translate(tl.x + wx, tl.y + tl.sq * 40); ctx.scale(s * (1 + tl.sq), s * (1 - tl.sq * 1.4));
-          if(tl.t >= 0){ ctx.fillStyle = TCOL[tl.t] + "55"; ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.fill(); }
+          const lonely = tl.t >= 0 && !tl.sp && !tl.die && ![[0,1],[1,0],[0,-1],[-1,0]].some(([a2, b2]) => sameAt(r, c, r + a2, c + b2));
+          if(lonely) ctx.globalAlpha = .5;
+          if(tl.t >= 0){ ctx.fillStyle = TCOL[tl.t]; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(-24, -24, 48, 48, 14); else ctx.rect(-24, -24, 48, 48); ctx.fill();
+            ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(-20, -21, 40, 14, 7); else ctx.rect(-20, -21, 40, 14); ctx.fill(); }
           if(tl.sp === "rainbow"){ ctx.fillStyle = `hsl(${(t*300)%360},90%,60%)`; ctx.beginPath(); ctx.arc(0, 0, 21, 0, 7); ctx.fill(); emoji(ctx, "🌈", 0, 0, 32); }
-          else { emoji(ctx, TYPES[tl.t], 0, 0, 42);
+          else { emoji(ctx, TYPES[tl.t], 0, 2, 40);
             if(tl.sp === "row" || tl.sp === "col"){ ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = 3; for(let k = -1; k <= 1; k++){ ctx.beginPath(); if(tl.sp === "row"){ ctx.moveTo(-19, k*8); ctx.lineTo(19, k*8); } else { ctx.moveTo(k*8, -19); ctx.lineTo(k*8, 19); } ctx.stroke(); } }
             if(tl.sp === "bomb"){ ctx.strokeStyle = `hsla(${(t*400)%360},100%,70%,.95)`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.stroke(); } }
-          ctx.restore();
+          ctx.globalAlpha = 1; ctx.restore();
           if(lock[r][c]){ ctx.strokeStyle = "#c0c8d0"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(tl.x - 24, tl.y - 24); ctx.lineTo(tl.x + 24, tl.y + 24); ctx.moveTo(tl.x + 24, tl.y - 24); ctx.lineTo(tl.x - 24, tl.y + 24); ctx.stroke(); } }));
+        nextToIce.forEach(([r, c]) => { ctx.strokeStyle = `rgba(255,220,90,${pulse})`; ctx.lineWidth = 4; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(GX + c*TS + 3, GY + r*TS + 3, TS - 6, TS - 6, 14); else ctx.rect(GX + c*TS + 3, GY + r*TS + 3, TS - 6, TS - 6); ctx.stroke(); });
         ctx.restore();
         ctx.restore();
         beams.forEach(b => { ctx.fillStyle = `rgba(255,255,255,${b.t * 2.5})`; if(b.r != null) ctx.fillRect(GX, GY + b.r*TS + TS/2 - 10, C*TS, 20); else ctx.fillRect(GX + b.c*TS + TS/2 - 10, GY, 20, R*TS); });
