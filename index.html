@@ -2265,7 +2265,7 @@ const GAMES = {
     sk = Object.assign({ attacker:"🤖", castle:"#6e7980", top:"#3fa34d", bolt:"#7fe7ff", bg:"#16251a" }, sk);
     const ROWS = 5, COLS = 10, RH = 60, Y0 = 58, X0 = 70, CW = 58, BAR = 374, STREET = X0 + COLS * CW;
     const rowY = r => Y0 + r * RH + RH/2, colX = c => X0 + c * CW + CW/2;
-    const CARDS = [
+    const ALL_CARDS = [
       { id:"power", e:"🔋", cost:50, cd:6, hp:6 },
       { id:"shoot", e:null, cost:100, cd:6, hp:6 },
       { id:"ice", e:null, cost:150, cd:10, hp:6 },
@@ -2273,7 +2273,9 @@ const GAMES = {
       { id:"mine", e:"🧨", cost:25, cd:20, hp:3 },
       { id:"bomb", e:"💣", cost:150, cd:26, hp:99 },
     ];
-    const cardX = i => 176 + i * 100;
+    /* keep it simple: 3 cards (power, blaster, wall); hard also gets ice and bomb */
+    const CARDS = ALL_CARDS.filter(c => DF() > 1 ? c.id !== "mine" : ["power", "shoot", "wall"].includes(c.id));
+    const cardX = i => CARDS.length <= 3 ? 280 + i * 150 : 176 + i * 110;
     let energy = DF() < 1 ? 200 : DF() > 1 ? 100 : 150, sel = null, t0 = 0, skyT = 7, flash = 0, banner = "GET READY… BUILD!", bannerT = 3, shake = 0;
     const cd = {}; CARDS.forEach(c => cd[c.id] = { bomb:20, wall:8, ice:14, mine:10 }[c.id] || 0);
     const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
@@ -2284,7 +2286,7 @@ const GAMES = {
     const TOTAL = DF() < 1 ? 14 : DF() > 1 ? 28 : 20, plan = [];
     const big1 = Math.round(TOTAL * .5), big2 = TOTAL - Math.round(TOTAL * .25);
     { let tm = 15; for(let i = 0; i < TOTAL; i++){ const f = i / TOTAL, r = Math.random();
-        let type = "walk"; if(f > .15 && r < .3) type = "helmet"; else if(f > .3 && r < .5) type = "fast"; else if(f > .45 && r < .62) type = "jumper"; else if(f > .55 && r < .75) type = "tank";
+        let type = "walk"; if(f > .15 && r < .3) type = "helmet"; else if(f > .3 && r < .5) type = "fast"; else if(DF() > 1 && f > .45 && r < .62) type = "jumper"; else if(DF() > 1 && f > .55 && r < .75) type = "tank";
         if(i === TOTAL - 1) type = "boss"; if(i === big1 && DF() > 1) type = "giant";
         const burst = (i >= big1 && i < big1 + 6) || i >= big2;
         tm += burst ? .8 + Math.random() * .7 : Math.max(2.6, 10 - f * 8) / Math.sqrt(DF()) * (.8 + Math.random() * .4);
@@ -2331,7 +2333,7 @@ const GAMES = {
         /* falling ⚡ from the sky, swaying as it drops */
         skyT -= dt; if(skyT <= 0){ skyT = 9 + Math.random() * 3; const gold = Math.random() < .3; orbs.push({ x: 110 + Math.random() * 480, y: -20, ty: 90 + Math.random() * 240, life: 10, v: gold ? 75 : 25, gold, ph: Math.random()*6 }); if(gold) api.sfx("powerup", .4); }
         orbs.forEach(o => { if(o.got){ o.fly += dt * 2.2; o.x += (70 - o.x) * Math.min(1, dt * 6); o.y += (BAR + 40 - o.y) * Math.min(1, dt * 6); if(o.fly >= 1 && !o.paid){ o.paid = true; energy += o.v; } }
-          else { if(o.y < o.ty){ o.y += 60 * dt; o.x += Math.sin(t0 * 2 + o.ph) * 30 * dt; } o.life -= dt; if(o.life < 3 && !o.auto){ o.auto = true; o.got = true; o.fly = 0; } } });
+          else { if(o.y < o.ty){ o.y += 60 * dt; o.x += Math.sin(t0 * 2 + o.ph) * 30 * dt; } o.life -= dt; if(o.y >= o.ty - 1) o.landT = (o.landT || 0) + dt; if(!o.auto && (o.life < 3 || o.landT > 1.2)){ o.auto = true; o.got = true; o.fly = 0; api.sfx("coin", .3); } } });
         orbs = orbs.filter(o => !o.paid);
         /* attackers arrive from the street */
         while(spawned < plan.length && t0 >= plan[spawned].at){ const pl = plan[spawned++], st = STATS[pl.type], k = DF() > 1 ? 1.25 : 1;
@@ -2483,8 +2485,21 @@ const GAMES = {
         [B[r][c], B[r2][c2]] = [B[r2][c2], B[r][c]]; const rs = runs(); [B[r][c], B[r2][c2]] = [B[r2][c2], B[r][c]];
         if(rs.length){ const near = rs.some(run => run.cells.some(([a, b]) => [[1,0],[-1,0],[0,1],[0,-1]].some(([x, y]) => isBlock(a + x, b + y)))); out.push({ m: [[r,c],[r2,c2]], good: near ? 2 : 0 }); } }
       return out; };
+    /* tap-to-pop: a group is 2+ touching sweets of the same kind */
+    const groupAt = (r, c) => { const t0 = B[r][c] && B[r][c].t; if(t0 == null || t0 < 0 || B[r][c].block) return [];
+      const seen = new Set([r + "," + c]), q = [[r, c]];
+      while(q.length){ const [y, x] = q.pop(); [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dy, dx]) => { const yy = y + dy, xx = x + dx, k = yy + "," + xx;
+        if(inB(yy, xx) && !seen.has(k) && B[yy][xx] && !B[yy][xx].block && !B[yy][xx].die && B[yy][xx].t === t0){ seen.add(k); q.push([yy, xx]); } }); }
+      return [...seen].map(k => k.split(",").map(Number)); };
+    const bestGroup = () => { let best = null, bs = -1; const done = new Set();
+      for(let r = 0; r < R; r++) for(let c = 0; c < C; c++){ if(done.has(r + "," + c) || !B[r][c] || B[r][c].block) continue;
+        if(B[r][c].sp){ const sc = 50; if(sc > bs){ bs = sc; best = [[r, c]]; } continue; }
+        const g = groupAt(r, c); g.forEach(([y, x]) => done.add(y + "," + x)); if(g.length < 2) continue;
+        const near = g.some(([y, x]) => [[1,0],[-1,0],[0,1],[0,-1]].some(([dy, dx]) => isBlock(y + dy, x + dx)));
+        const sc = g.length + (near ? 100 : 0); if(sc > bs){ bs = sc; best = g; } }
+      return best; };
     const bestMove = () => { const l = moveList(); if(!l.length) return null; const g = l.filter(x => x.good === 2); return (g.length ? g : l)[0].m; };
-    window.__m3 = () => ({ found, NK, moves, state, hint: bestMove(), blocks: B.flat().filter(t => t && t.block).length, rush: rush && { i: rush.i, n: rush.n, done: !!rush.done }, combo });
+    window.__m3 = () => ({ found, NK, moves, state, hint: bestGroup(), blocks: B.flat().filter(t => t && t.block).length, rush: rush && { i: rush.i, n: rush.n, done: !!rush.done }, combo });
     /* hit a key block; when it breaks, the key pops out big and flies to the vault */
     const hitBlock = (r, c, hitSet) => { const k = r + "," + c; if(hitSet.has(k)) return; hitSet.add(k); const b = B[r][c]; if(!b || !b.block || b.die) return;
       b.hp--; b.shake = .3; api_.sfx("clink", .7); for(let i = 0; i < 8; i++) parts.push({ x: cx(c), y: cy(r), vx: (Math.random()-.5)*320, vy: -Math.random()*280, t: .6, ice: true });
@@ -2570,7 +2585,7 @@ const GAMES = {
           else if(a.sp && b2.sp){ a.sp = b2.sp = null; for(let c = 0; c < C; c++) add(r0, c); for(let r = 0; r < R; r++) add(r, c0); beams.push({ r: r0, t: .3 }, { c: c0, t: .3 }); say("CROSS BLAST!"); }
           blast(set); state = "clear"; stateT = 0; return; }
         if(state === "clear"){ if(B.some(row => row.some(tl => tl && tl.die && tl.die < .22))) return; finishClear(); return; }
-        if(state === "fall" && settled()){ if(!resolve(null)){ state = "idle"; if(!moveList().length){ reshuffle(); say("SHUFFLE!"); } } return; }
+        if(state === "fall" && settled()){ if(!resolve(null)){ state = "idle"; if(!bestGroup()){ reshuffle(); say("SHUFFLE!"); } } return; }
         if(state !== "idle" || keyPop) return;
         /* SUGAR RUSH: every move left becomes a special sweet, then they all go off at once */
         if(found >= NK){
@@ -2587,15 +2602,20 @@ const GAMES = {
           if(!rush.boom){ if(rush.t < .35) return; rush.boom = true; combo = 1; blast(new Set(rush.cells)); state = "clear"; stateT = 0; shakeB = .5; api.sfx("boom", 1); api.sfx("combo", .6, 2); api.coin(Math.min(6, rush.n), GX + C*TS/2, LH/2); say("MEGA SWEET!"); return; }
           rush.done = true; api.sfx("victory", .6); return; }
         if(moves <= 0){ moves += 5; say("+5 MOVES!"); api.sfx("powerup", .6); return; }
-        idleT += dt; if(idleT > (moved ? 15 : 8) && !hint) hint = bestMove();
+        idleT += dt; if(idleT > (moved ? 15 : 8) && !hint) hint = bestGroup();
         const cellAt = p => { const c = Math.floor((p.x - GX) / TS), r = Math.floor((p.y - GY) / TS); return inB(r, c) ? [r, c] : null; };
-        inp.taps.forEach(p => { const cell = cellAt(p); if(!cell){ sel = null; return; }
-          if(!swappable(...cell)){ api.sfx("wrong", .35); sel = null; return; }
-          if(sel && Math.abs(sel[0] - cell[0]) + Math.abs(sel[1] - cell[1]) === 1){ trySwap(sel, cell, api); return; }
-          sel = cell; api.sfx("blip", .3); });
-        if(state === "idle" && inp.released && inp.released.from && inp.released.to){ const a = inp.released.from, b2 = inp.released.to, dx = b2.x - a.x, dy = b2.y - a.y;
-          if(Math.hypot(dx, dy) > 24){ const from = cellAt(a); if(from){ const to = Math.abs(dx) > Math.abs(dy) ? [from[0], from[1] + Math.sign(dx)] : [from[0] + Math.sign(dy), from[1]];
-            if(swappable(...from) && swappable(...to)) trySwap(from, to, api); else api.sfx("wrong", .35); } } }
+        inp.taps.forEach(p => { if(state !== "idle") return; const cell = cellAt(p); if(!cell) return; const [r, c] = cell, tl = B[r][c];
+          if(!tl || tl.block){ api.sfx("wrong", .35); return; }
+          /* a special sweet goes off when you tap it */
+          if(tl.sp){ moves--; moved = true; hint = null; idleT = 0; combo = 1; api.sfx("boom", .7); blast(new Set([r + "," + c])); state = "clear"; stateT = 0; return; }
+          const g = groupAt(r, c);
+          if(g.length < 2){ api.sfx("wrong", .35); tl.sq = .25; return; }
+          moves--; moved = true; hint = null; idleT = 0; combo = 1;
+          const set = new Set(g.map(([y, x]) => y + "," + x));
+          /* big groups hit harder: 5+ also pops everything around where you tapped */
+          if(g.length >= 5){ for(let i = -1; i <= 1; i++) for(let j = -1; j <= 1; j++) if(inB(r + i, c + j) && B[r + i][c + j] && !B[r + i][c + j].block) set.add((r + i) + "," + (c + j)); parts.push({ x: cx(c), y: cy(r), boom: .4 }); say(g.length >= 8 ? "MEGA POP!" : "BIG POP!"); }
+          api.sfx("combo", .5, 1 + Math.min(1, g.length * .08)); if(g.length >= 4) api.coin(1, cx(c), cy(r));
+          blast(set); state = "clear"; stateT = 0; });
       },
       draw(ctx, t){
         const g = ctx.createLinearGradient(0,0,0,LH); g.addColorStop(0, "#2a1446"); g.addColorStop(1, "#120a24"); ctx.fillStyle = g; ctx.fillRect(0,0,LW,LH);
@@ -2653,8 +2673,7 @@ const GAMES = {
           const bounce = 1 + Math.max(0, Math.sin(keyPop.t * 14)) * Math.max(0, .6 - keyPop.t) * .6; ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(t * 8) * .2); ctx.scale(bounce, bounce); emoji(ctx, "🔑", 0, 0, 40 + 70 * k); ctx.restore();
           ctx.fillStyle = "#ffd34d"; ctx.strokeStyle = "#5a2a00"; ctx.lineWidth = 8; ctx.font = '54px "Luckiest Guy", sans-serif'; ctx.textAlign = "center"; const txt = `${keyPop.slot + 1} / ${NK}`; ctx.strokeText(txt, x, y + 100); ctx.fillText(txt, x, y + 100); }
         /* first moves: a hand shows the swap next to a key block */
-        if(!moved && tut > .5 && hint){ const [a, b2] = hint, u = (tut % 1.6) / 1.6, e = Math.min(1, u * 1.6);
-          const hx = cx(a[1]) + (cx(b2[1]) - cx(a[1])) * e, hy = cy(a[0]) + (cy(b2[0]) - cy(a[0])) * e; emoji(ctx, "👆", hx + 10, hy + 26, 46); }
+        if(!moved && tut > .5 && hint){ const [a] = hint, press = Math.abs(Math.sin(t * 4)) * 12; emoji(ctx, "👆", cx(a[1]) + 10, cy(a[0]) + 22 + press, 46); }
         if(bannerT > 0 && banner){ const k = Math.min(1, bannerT * 2), pop = 1 + Math.max(0, bannerT - 1.1) * 1.5; ctx.save(); ctx.translate(GX + C*TS/2, LH/2); ctx.scale(pop, pop); ctx.globalAlpha = k; ctx.fillStyle = "#ffd34d"; ctx.strokeStyle = "#7a2a8a"; ctx.lineWidth = 8; ctx.font = '50px "Luckiest Guy", sans-serif'; ctx.textAlign = "center"; ctx.strokeText(banner, 0, 0); ctx.fillText(banner, 0, 0); ctx.restore(); ctx.globalAlpha = 1; }
       }
     };
@@ -3203,7 +3222,7 @@ const GAMES = {
         spawn -= dt; if(spawn <= 0){ spawn = (.5 + Math.random()*.35) / Math.sqrt(DF());
           const r = Math.random(), lane = Math.floor(Math.random()*3);
           if(r < .12){ objs.push({ lane, y: -40, kind:"pow", pow: pickPow() }); }
-          else if(r < .62){ const o = { lane, y: -40, kind:"bad" }; if(DF() >= 1 && Math.random() < .2 * DF()){ o.wob = 1; o.ph = Math.random()*6; } objs.push(o);
+          else if(r < .62){ const o = { lane, y: -40, kind:"bad" }; objs.push(o);   /* obstacles stay in their own lane */
             if(DF() > 1 && Math.random() < .25) objs.push({ lane: (lane + 1 + Math.floor(Math.random()*2)) % 3, y: -40, kind:"bad" }); }
           else { for(let k = 0; k < 3; k++) objs.push({ lane, y: -40 - k*55, kind:"col" }); } }
         objs.forEach(o => {
