@@ -2274,7 +2274,10 @@ const GAMES = {
       { id:"bomb", e:"💣", cost:150, cd:26, hp:99 },
     ];
     /* keep it simple: 3 cards (power, blaster, wall); hard also gets ice and bomb */
-    const CARDS = ALL_CARDS.filter(c => DF() > 1 ? c.id !== "mine" : ["power", "shoot", "wall"].includes(c.id));
+    /* easy: no power at all, cards are free and just refill themselves */
+    const FREE = DF() < 1;
+    const CARDS = FREE ? ALL_CARDS.filter(c => ["shoot", "wall", "bomb"].includes(c.id)).map(c => Object.assign({}, c, { cost: 0, cd: { shoot: 4, wall: 10, bomb: 22 }[c.id] }))
+      : ALL_CARDS.filter(c => DF() > 1 ? c.id !== "mine" : ["power", "shoot", "wall"].includes(c.id));
     const cardX = i => CARDS.length <= 3 ? 280 + i * 150 : 176 + i * 110;
     let energy = DF() < 1 ? 200 : DF() > 1 ? 100 : 150, sel = null, t0 = 0, skyT = 7, flash = 0, banner = "GET READY… BUILD!", bannerT = 3, shake = 0;
     const cd = {}; CARDS.forEach(c => cd[c.id] = { bomb:20, wall:8, ice:14, mine:10 }[c.id] || 0);
@@ -2331,7 +2334,7 @@ const GAMES = {
               for(let i = 0; i < 6; i++) crumbs.push({ x: colX(c), y: rowY(r) + 18, vx: (Math.random()-.5)*160, vy: -Math.random()*160, t: .5, col: "#6a4a2a" }); } }
         });
         /* falling ⚡ from the sky, swaying as it drops */
-        skyT -= dt; if(skyT <= 0){ skyT = 9 + Math.random() * 3; const gold = Math.random() < .3; orbs.push({ x: 110 + Math.random() * 480, y: -20, ty: 90 + Math.random() * 240, life: 10, v: gold ? 75 : 25, gold, ph: Math.random()*6 }); if(gold) api.sfx("powerup", .4); }
+        if(!FREE) skyT -= dt; if(skyT <= 0){ skyT = 9 + Math.random() * 3; const gold = Math.random() < .3; orbs.push({ x: 110 + Math.random() * 480, y: -20, ty: 90 + Math.random() * 240, life: 10, v: gold ? 75 : 25, gold, ph: Math.random()*6 }); if(gold) api.sfx("powerup", .4); }
         orbs.forEach(o => { if(o.got){ o.fly += dt * 2.2; o.x += (70 - o.x) * Math.min(1, dt * 6); o.y += (BAR + 40 - o.y) * Math.min(1, dt * 6); if(o.fly >= 1 && !o.paid){ o.paid = true; energy += o.v; } }
           else { if(o.y < o.ty){ o.y += 60 * dt; o.x += Math.sin(t0 * 2 + o.ph) * 30 * dt; } o.life -= dt; if(o.y >= o.ty - 1) o.landT = (o.landT || 0) + dt; if(!o.auto && (o.life < 3 || o.landT > 1.2)){ o.auto = true; o.got = true; o.fly = 0; api.sfx("coin", .3); } } });
         orbs = orbs.filter(o => !o.paid);
@@ -2429,14 +2432,14 @@ const GAMES = {
         ctx.restore();
         /* the card tray */
         ctx.fillStyle = "rgba(20,14,8,.85)"; ctx.fillRect(0, BAR - 4, LW, LH - BAR + 4);
-        ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(14, BAR + 6, 110, 58, 12) : ctx.rect(14, BAR + 6, 110, 58); ctx.fill();
-        ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 28px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText(`⚡${energy}`, 69, BAR + 46);
+        if(!FREE){ ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(14, BAR + 6, 110, 58, 12) : ctx.rect(14, BAR + 6, 110, 58); ctx.fill();
+        ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 28px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText(`⚡${energy}`, 69, BAR + 46); }
         CARDS.forEach((c, i) => { const x = cardX(i), ok = energy >= c.cost && cd[c.id] <= 0, on = sel === c.id, lift = on ? -6 : 0;
           ctx.fillStyle = on ? "#f2c14e" : ok ? "#3a4a6e" : "#1f2433"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 46, BAR + 4 + lift, 92, 64, 10) : ctx.rect(x - 46, BAR + 4 + lift, 92, 64); ctx.fill();
           if(ok && !on){ ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 2; ctx.stroke(); }
           ctx.globalAlpha = ok || on ? 1 : .4;
           if(c.e) emoji(ctx, c.e, x, BAR + 28 + lift, 30); else { drawHead(ctx, key, x, BAR + 26 + lift, 14); if(c.id === "ice") emoji(ctx, "❄️", x + 16, BAR + 14 + lift, 16); }
-          ctx.fillStyle = on ? "#1b1b1b" : "#ffd34d"; ctx.font = 'bold 17px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText(`⚡${c.cost}`, x, BAR + 62 + lift);
+          ctx.fillStyle = on ? "#1b1b1b" : "#ffd34d"; ctx.font = 'bold 17px Nunito, sans-serif'; ctx.textAlign = "center"; if(!FREE) ctx.fillText(`⚡${c.cost}`, x, BAR + 62 + lift);
           ctx.globalAlpha = 1;
           if(cd[c.id] > 0){ const k = cd[c.id] / c.cd; ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(x - 46, BAR + 4, 92, 64 * Math.min(1, k)); } });
         /* wave meter: flags mark the big waves */
