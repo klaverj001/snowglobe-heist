@@ -2462,7 +2462,7 @@ const GAMES = {
     const NK = DF() < 1 ? 2 : DF() > 1 ? 4 : 3, BHP = 2; let moves = DF() < 1 ? 26 : DF() > 1 ? 22 : 24;
     const cx = c => GX + c * TS + TS/2, cy = r => GY + r * TS + TS/2;
     const B = Array.from({ length: R }, () => Array(C).fill(null)), lock = Array.from({ length: R }, () => Array(C).fill(0));
-    let found = 0, keyPop = null, sel = null, state = "idle", stateT = 0, combo = 0, idleT = 0, hint = null, flyKeys = [], parts = [], banner = null, bannerT = 0, swapA = null, swapB = null, beams = [], tut = 0, moved = false, api_ = null;
+    let dragCell = null, dragV = { x:0, y:0 }, found = 0, keyPop = null, sel = null, state = "idle", stateT = 0, combo = 0, idleT = 0, hint = null, flyKeys = [], parts = [], banner = null, bannerT = 0, swapA = null, swapB = null, beams = [], tut = 0, moved = false, api_ = null;
     let plus = [], rush = null, slotPop = [0, 0, 0, 0], shakeB = 0;
     const rnd = () => Math.floor(Math.random() * TYPES.length);
     const mk = (r, c, t, y) => ({ t: t == null ? rnd() : t, sp: null, x: cx(c), y: y == null ? cy(r) : y, die: 0, vy: 0, sq: 0 });
@@ -2502,7 +2502,7 @@ const GAMES = {
         const sc = g.length + (near ? 100 : 0); if(sc > bs){ bs = sc; best = g; } }
       return best; };
     const bestMove = () => { const l = moveList(); if(!l.length) return null; const g = l.filter(x => x.good === 2); return (g.length ? g : l)[0].m; };
-    window.__m3 = () => ({ found, NK, moves, state, hint: bestGroup(), blocks: B.flat().filter(t => t && t.block).length, rush: rush && { i: rush.i, n: rush.n, done: !!rush.done }, combo });
+    window.__m3 = () => ({ found, NK, moves, state, hint: bestMove(), blocks: B.flat().filter(t => t && t.block).length, rush: rush && { i: rush.i, n: rush.n, done: !!rush.done }, combo });
     /* hit a key block; when it breaks, the key pops out big and flies to the vault */
     const hitBlock = (r, c, hitSet) => { const k = r + "," + c; if(hitSet.has(k)) return; hitSet.add(k); const b = B[r][c]; if(!b || !b.block || b.die) return;
       b.hp--; b.shake = .3; api_.sfx("clink", .7); for(let i = 0; i < 8; i++) parts.push({ x: cx(c), y: cy(r), vx: (Math.random()-.5)*320, vy: -Math.random()*280, t: .6, ice: true });
@@ -2588,7 +2588,7 @@ const GAMES = {
           else if(a.sp && b2.sp){ a.sp = b2.sp = null; for(let c = 0; c < C; c++) add(r0, c); for(let r = 0; r < R; r++) add(r, c0); beams.push({ r: r0, t: .3 }, { c: c0, t: .3 }); say("CROSS BLAST!"); }
           blast(set); state = "clear"; stateT = 0; return; }
         if(state === "clear"){ if(B.some(row => row.some(tl => tl && tl.die && tl.die < .22))) return; finishClear(); return; }
-        if(state === "fall" && settled()){ if(!resolve(null)){ state = "idle"; if(!bestGroup()){ reshuffle(); say("SHUFFLE!"); } } return; }
+        if(state === "fall" && settled()){ if(!resolve(null)){ state = "idle"; if(!moveList().length){ reshuffle(); say("SHUFFLE!"); } } return; }
         if(state !== "idle" || keyPop) return;
         /* SUGAR RUSH: every move left becomes a special sweet, then they all go off at once */
         if(found >= NK){
@@ -2605,20 +2605,17 @@ const GAMES = {
           if(!rush.boom){ if(rush.t < .35) return; rush.boom = true; combo = 1; blast(new Set(rush.cells)); state = "clear"; stateT = 0; shakeB = .5; api.sfx("boom", 1); api.sfx("combo", .6, 2); api.coin(Math.min(6, rush.n), GX + C*TS/2, LH/2); say("MEGA SWEET!"); return; }
           rush.done = true; api.sfx("victory", .6); return; }
         if(moves <= 0){ moves += 5; say("+5 MOVES!"); api.sfx("powerup", .6); return; }
-        idleT += dt; if(idleT > (moved ? 15 : 8) && !hint) hint = bestGroup();
+        idleT += dt; if(idleT > (moved ? 15 : 8) && !hint) hint = bestMove();
         const cellAt = p => { const c = Math.floor((p.x - GX) / TS), r = Math.floor((p.y - GY) / TS); return inB(r, c) ? [r, c] : null; };
-        inp.taps.forEach(p => { if(state !== "idle") return; const cell = cellAt(p); if(!cell) return; const [r, c] = cell, tl = B[r][c];
-          if(!tl || tl.block){ api.sfx("wrong", .35); return; }
-          /* a special sweet goes off when you tap it */
-          if(tl.sp){ moves--; moved = true; hint = null; idleT = 0; combo = 1; api.sfx("boom", .7); blast(new Set([r + "," + c])); state = "clear"; stateT = 0; return; }
-          const g = groupAt(r, c);
-          if(g.length < 2){ api.sfx("wrong", .35); tl.sq = .25; return; }
-          moves--; moved = true; hint = null; idleT = 0; combo = 1;
-          const set = new Set(g.map(([y, x]) => y + "," + x));
-          /* big groups hit harder: 5+ also pops everything around where you tapped */
-          if(g.length >= 5){ for(let i = -1; i <= 1; i++) for(let j = -1; j <= 1; j++) if(inB(r + i, c + j) && B[r + i][c + j] && !B[r + i][c + j].block) set.add((r + i) + "," + (c + j)); parts.push({ x: cx(c), y: cy(r), boom: .4 }); say(g.length >= 8 ? "MEGA POP!" : "BIG POP!"); }
-          api.sfx("combo", .5, 1 + Math.min(1, g.length * .08)); if(g.length >= 4) api.coin(1, cx(c), cy(r));
-          blast(set); state = "clear"; stateT = 0; });
+        /* drag (or tap one sweet, then its neighbour) to swap */
+        dragCell = null; if(inp.pointer && inp.down){ const dc = cellAt(inp.down); if(dc && swappable(...dc)){ dragCell = dc; dragV = { x: inp.pointer.x - inp.down.x, y: inp.pointer.y - inp.down.y }; } }
+        inp.taps.forEach(p => { const cell = cellAt(p); if(!cell){ sel = null; return; }
+          if(!swappable(...cell)){ api.sfx("wrong", .35); sel = null; return; }
+          if(sel && Math.abs(sel[0] - cell[0]) + Math.abs(sel[1] - cell[1]) === 1){ trySwap(sel, cell, api); return; }
+          sel = cell; api.sfx("blip", .3); });
+        if(state === "idle" && inp.released && inp.released.from && inp.released.to){ const a = inp.released.from, b2 = inp.released.to, dx = b2.x - a.x, dy = b2.y - a.y;
+          if(Math.hypot(dx, dy) > 24){ const from = cellAt(a); if(from){ const to = Math.abs(dx) > Math.abs(dy) ? [from[0], from[1] + Math.sign(dx)] : [from[0] + Math.sign(dy), from[1]];
+            if(swappable(...from) && swappable(...to)) trySwap(from, to, api); else api.sfx("wrong", .35); } } }
       },
       draw(ctx, t){
         const g = ctx.createLinearGradient(0,0,0,LH); g.addColorStop(0, "#4a2a7a"); g.addColorStop(1, "#24143e"); ctx.fillStyle = g; ctx.fillRect(0,0,LW,LH);
@@ -2627,13 +2624,7 @@ const GAMES = {
         ctx.fillStyle = "rgba(255,255,255,.16)"; rr(GX - 10, GY - 10, C*TS + 20, R*TS + 20, 22); ctx.fill();
         ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 3; ctx.stroke();
         for(let r = 0; r < R; r++) for(let c = 0; c < C; c++){ ctx.fillStyle = (r + c) % 2 ? "rgba(20,10,40,.35)" : "rgba(20,10,40,.22)"; rr(GX + c*TS + 2, GY + r*TS + 2, TS - 4, TS - 4, 12); ctx.fill(); }
-        /* groups you can pop are joined by coloured bridges, so he can see them */
-        const sameAt = (r, c, r2, c2) => inB(r2, c2) && B[r][c] && B[r2][c2] && !B[r][c].block && !B[r2][c2].block && !B[r][c].die && !B[r2][c2].die && B[r][c].t >= 0 && B[r][c].t === B[r2][c2].t
-          && Math.abs(B[r][c].y - cy(r)) < 2 && Math.abs(B[r2][c2].y - cy(r2)) < 2;
-        for(let r = 0; r < R; r++) for(let c = 0; c < C; c++){ const tl = B[r][c]; if(!tl || tl.block || tl.t < 0) continue;
-          ctx.fillStyle = TCOL[tl.t] + "aa";
-          if(sameAt(r, c, r, c + 1)){ rr(cx(c), cy(r) - 13, TS, 26, 13); ctx.fill(); }
-          if(sameAt(r, c, r + 1, c)){ rr(cx(c) - 13, cy(r), 26, TS, 13); ctx.fill(); } }
+
         /* glow on the squares next to a key block: match here! */
         const pulse = .55 + .4 * Math.sin(t * 5), nextToIce = [];
         for(let r = 0; r < R; r++) for(let c = 0; c < C; c++) if(isBlock(r, c) && !B[r][c].die) [[1,0],[-1,0],[0,1],[0,-1]].forEach(([a, b]) => { if(inB(r + a, c + b) && !isBlock(r + a, c + b)){ nextToIce.push([r + a, c + b]); } });
@@ -2650,17 +2641,24 @@ const GAMES = {
           let s = tl.die ? Math.max(0, 1 - tl.die / .22) : 1;
           let wx = 0; if(hint && hint.some(h => h[0] === r && h[1] === c)) wx = Math.sin(t*14) * 5;
           const isSel = sel && sel[0] === r && sel[1] === c; if(isSel){ ctx.fillStyle = "rgba(255,230,120,.45)"; ctx.fillRect(cx(c) - TS/2 + 2, cy(r) - TS/2 + 2, TS - 4, TS - 4); s *= 1.1 + Math.sin(t*10)*.05; }
-          ctx.save(); ctx.translate(tl.x + wx, tl.y + tl.sq * 40); ctx.scale(s * (1 + tl.sq), s * (1 - tl.sq * 1.4));
-          const lonely = tl.t >= 0 && !tl.sp && !tl.die && ![[0,1],[1,0],[0,-1],[-1,0]].some(([a2, b2]) => sameAt(r, c, r + a2, c + b2));
-          if(lonely) ctx.globalAlpha = .5;
+          let dx2 = 0, dy2 = 0, lifted = dragCell && dragCell[0] === r && dragCell[1] === c && state === "idle";
+          if(lifted){ const horiz = Math.abs(dragV.x) > Math.abs(dragV.y); dx2 = horiz ? Math.max(-26, Math.min(26, dragV.x)) : 0; dy2 = horiz ? 0 : Math.max(-26, Math.min(26, dragV.y)); s *= 1.15; }
+          ctx.save(); ctx.translate(tl.x + wx + dx2, tl.y + tl.sq * 40 + dy2);
+          if(lifted){ ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 8; } ctx.scale(s * (1 + tl.sq), s * (1 - tl.sq * 1.4));
           if(tl.t >= 0){ ctx.fillStyle = TCOL[tl.t]; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(-24, -24, 48, 48, 14); else ctx.rect(-24, -24, 48, 48); ctx.fill();
             ctx.fillStyle = "rgba(255,255,255,.35)"; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(-20, -21, 40, 14, 7); else ctx.rect(-20, -21, 40, 14); ctx.fill(); }
           if(tl.sp === "rainbow"){ ctx.fillStyle = `hsl(${(t*300)%360},90%,60%)`; ctx.beginPath(); ctx.arc(0, 0, 21, 0, 7); ctx.fill(); emoji(ctx, "🌈", 0, 0, 32); }
           else { emoji(ctx, TYPES[tl.t], 0, 2, 40);
             if(tl.sp === "row" || tl.sp === "col"){ ctx.strokeStyle = "rgba(255,255,255,.95)"; ctx.lineWidth = 3; for(let k = -1; k <= 1; k++){ ctx.beginPath(); if(tl.sp === "row"){ ctx.moveTo(-19, k*8); ctx.lineTo(19, k*8); } else { ctx.moveTo(k*8, -19); ctx.lineTo(k*8, 19); } ctx.stroke(); } }
             if(tl.sp === "bomb"){ ctx.strokeStyle = `hsla(${(t*400)%360},100%,70%,.95)`; ctx.lineWidth = 4; ctx.beginPath(); ctx.arc(0, 0, 24, 0, 7); ctx.stroke(); } }
+          ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetY = 0;
+          if(tl.die){ ctx.fillStyle = `rgba(255,255,255,${Math.max(0, .9 - tl.die * 3)})`; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(-26, -26, 52, 52, 14); else ctx.rect(-26, -26, 52, 52); ctx.fill(); }
           ctx.globalAlpha = 1; ctx.restore();
           if(lock[r][c]){ ctx.strokeStyle = "#c0c8d0"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(tl.x - 24, tl.y - 24); ctx.lineTo(tl.x + 24, tl.y + 24); ctx.moveTo(tl.x + 24, tl.y - 24); ctx.lineTo(tl.x - 24, tl.y + 24); ctx.stroke(); } }));
+        if(dragCell && state === "idle" && Math.hypot(dragV.x, dragV.y) > 10){ const horiz = Math.abs(dragV.x) > Math.abs(dragV.y), tr = dragCell[0] + (horiz ? 0 : Math.sign(dragV.y)), tc = dragCell[1] + (horiz ? Math.sign(dragV.x) : 0);
+          if(inB(tr, tc)){ ctx.strokeStyle = "#fff"; ctx.lineWidth = 5; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(GX + tc*TS + 2, GY + tr*TS + 2, TS - 4, TS - 4, 14); else ctx.rect(GX + tc*TS + 2, GY + tr*TS + 2, TS - 4, TS - 4); ctx.stroke(); } }
+        if(sel){ ctx.strokeStyle = "#fff"; ctx.lineWidth = 5; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(GX + sel[1]*TS + 1, GY + sel[0]*TS + 1, TS - 2, TS - 2, 14); else ctx.rect(GX + sel[1]*TS + 1, GY + sel[0]*TS + 1, TS - 2, TS - 2); ctx.stroke();
+          [[0,1],[1,0],[0,-1],[-1,0]].forEach(([a2, b2]) => { const r2 = sel[0] + a2, c2 = sel[1] + b2; if(inB(r2, c2) && swappable(r2, c2)){ ctx.globalAlpha = .6 + .3 * Math.sin(t * 8); emoji(ctx, a2 ? (a2 > 0 ? "⬇️" : "⬆️") : (b2 > 0 ? "➡️" : "⬅️"), cx(sel[1]) + b2 * TS * .62, cy(sel[0]) + a2 * TS * .62, 20); ctx.globalAlpha = 1; } }); }
         nextToIce.forEach(([r, c]) => { ctx.strokeStyle = `rgba(255,220,90,${pulse})`; ctx.lineWidth = 4; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(GX + c*TS + 3, GY + r*TS + 3, TS - 6, TS - 6, 14); else ctx.rect(GX + c*TS + 3, GY + r*TS + 3, TS - 6, TS - 6); ctx.stroke(); });
         ctx.restore();
         ctx.restore();
@@ -2689,7 +2687,8 @@ const GAMES = {
           const bounce = 1 + Math.max(0, Math.sin(keyPop.t * 14)) * Math.max(0, .6 - keyPop.t) * .6; ctx.save(); ctx.translate(x, y); ctx.rotate(Math.sin(t * 8) * .2); ctx.scale(bounce, bounce); emoji(ctx, "🔑", 0, 0, 40 + 70 * k); ctx.restore();
           ctx.fillStyle = "#ffd34d"; ctx.strokeStyle = "#5a2a00"; ctx.lineWidth = 8; ctx.font = '54px "Luckiest Guy", sans-serif'; ctx.textAlign = "center"; const txt = `${keyPop.slot + 1} / ${NK}`; ctx.strokeText(txt, x, y + 100); ctx.fillText(txt, x, y + 100); }
         /* first moves: a hand shows the swap next to a key block */
-        if(!moved && tut > .5 && hint){ const [a] = hint, press = Math.abs(Math.sin(t * 4)) * 12; emoji(ctx, "👆", cx(a[1]) + 10, cy(a[0]) + 22 + press, 46); }
+        if(!moved && tut > .5 && hint){ const [a, b2] = hint, u = (tut % 1.6) / 1.6, e = Math.min(1, u * 1.6);
+          const hx = cx(a[1]) + (cx(b2[1]) - cx(a[1])) * e, hy = cy(a[0]) + (cy(b2[0]) - cy(a[0])) * e; emoji(ctx, "👆", hx + 10, hy + 26, 46); }
         if(bannerT > 0 && banner){ const k = Math.min(1, bannerT * 2), pop = 1 + Math.max(0, bannerT - 1.1) * 1.5; ctx.save(); ctx.translate(GX + C*TS/2, LH/2); ctx.scale(pop, pop); ctx.globalAlpha = k; ctx.fillStyle = "#ffd34d"; ctx.strokeStyle = "#7a2a8a"; ctx.lineWidth = 8; ctx.font = '50px "Luckiest Guy", sans-serif'; ctx.textAlign = "center"; ctx.strokeText(banner, 0, 0); ctx.fillText(banner, 0, 0); ctx.restore(); ctx.globalAlpha = 1; }
       }
     };
