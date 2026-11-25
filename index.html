@@ -1200,7 +1200,7 @@ const THEMES = {
     L("breakout","Fireball Breaker","🔥","Fireball breaker! Slide your finger to move the paddle. Bounce the fireball and smash all the bricks!",{ ball:"🔥", bricks:["#b5552a","#e2452e","#f2b34a","#7a3010"], bg:"#1a0a08" }),
     L("stack","Build My Castle","🧱","Build my castle! A block moves across the top. Tap to drop it on the tower. Build it really tall!",{ colors:["#7a7a7a","#b5552a","#5a5a5a","#e2452e"], sky:["#5a1408","#e0602e"], top:"🏰" }),
     L("crossing","Lava Crossing","🌋","Lava crossing! Cross to the other side, but dodge the fireballs! Tap where you want to hop, or use the arrows.",{ hazard:"🔥", goal:"🪙", safe:"#3a2a2a", lane:"#c8501e", line:"#ffd34d" }),
-    L("defense","Defend My Castle","🏯","Elves are marching to my castle! Tap a card, then tap the grass to build defenders. Grab the lightning bolts for power!",{ attacker:"🧝", castle:"#5a5a5a", top:"#e2452e", bolt:"#ff9a3a", bg:"#2a1208" }),
+    L("defense","Zombie Garden","🧟","Elves are marching to my castle! Tap a card, then tap the grass to build defenders. Grab the lightning bolts for power!",{ attacker:"🧝", castle:"#5a5a5a", top:"#e2452e", bolt:"#ff9a3a", bg:"#2a1208" }),
     L("pacman","Koopa Chomp","🟡","Gobble time! Use the arrows to move through my castle maze. Eat all the dots! Grab a mushroom to make the ghosts scared, then chase them!",{ dot:"#ffd34d", power:"🍄", chasers:["👻","👻","👻"], wall:"#5a1408", wall2:"#e0602e", bg:"#1a0a08" }),
     L("pong","Fireball Tennis","🏓","Fireball tennis! Slide your finger up and down to move your paddle. Bounce the fireball past the elf to score!",{ ball:"🔥", opp:"🧝", bg:"#2a1208", opPaddle:"#3fa34d" })
   ],
@@ -1236,7 +1236,7 @@ const THEMES = {
     L("battle","Three-Headed Dragon","🐉","A giant three-headed dragon is here! Dodge his lightning with the arrows, and press the blue button to blast him with your atomic ray!",{ em:"🐉", fly:true, shot:"⚡", beam:"#4fc3ff", ground:"#2a3a4a", fire:"🔵 RAY", sfx:"ray" }),
     L("catch","Fish Feast","🐟","Snack time! Fish are falling into the sea! Slide your finger to catch the fish, but dodge the anchors!",{ good:"🐟", bad:"⚓", sky:["#0a3a6a","#2a7ab0"], ground:"#0a2a4a" }),
     L("crossing","Ship Crossing","🚢","Swim across the bay, but dodge the big ships! Tap where you want to go.",{ hazard:"🚢", goal:"🐟", safe:"#c8a060", lane:"#0a4a7a", line:"#4fc3ff" }),
-    L("defense","Defend Monster Island","🏝️","Giant lobsters are crawling to Monster Island! Tap a card, then tap the grass to build defenders. Grab the lightning bolts for power!",{ attacker:"🦞", castle:"#3a5a2a", top:"#4fc3ff", bolt:"#4fc3ff", bg:"#0a2a3a" }),
+    L("defense","Zombie Garden","🧟","Giant lobsters are crawling to Monster Island! Tap a card, then tap the grass to build defenders. Grab the lightning bolts for power!",{ attacker:"🦞", castle:"#3a5a2a", top:"#4fc3ff", bolt:"#4fc3ff", bg:"#0a2a3a" }),
     L("pacman","Deep Sea Gobble","🐟","Gobble time! Swim through the sea maze with the arrows. Eat all the dots! Grab a battery to make the squids scared, then chase them!",{ dot:"#7fd8ff", power:"🔋", chasers:["🦑","🦑","🦑"], wall:"#0a3a5a", wall2:"#4fc3ff", bg:"#05182a" }),
     L("pong","Monster Volley","🏓","Monster volley! Slide your finger up and down to move. Bounce the boulder past the giant ape to score!",{ ball:"🪨", opp:"🦍", bg:"#1a2a3a", opPaddle:"#7a5a3a" })
   ],
@@ -1289,7 +1289,7 @@ const THEMES = {
     L("pong","Block Pong","🏓","Block pong! Slide your finger up and down to move your paddle. Bounce the diamond past the zombie to score!",{ ball:"💎", opp:"🧟", bg:"#05080c", opPaddle:"#7a5230" })
   ],
   doom: [
-    L("defense","Robot Army","🤖",null),
+    L("defense","Zombie Garden","🧟",null),
     L("throw","Catapult Siege","🏹","Catapult! Pull back with your finger and let go to fling a rock. Knock all the heroes off their towers!",{ proj:"🪨", target:"🦸", block:"#7f878c", sky:["#1a3a1a","#5a8a5a"], ground:"#2a3a2a" }),
     L("stack","Build Doom's Castle","🏰","Build Doom's castle! Tap to drop each stone on top. Make it the tallest castle in the world!",{ colors:["#6e7980","#3fa34d","#4a4a4a","#9aa5ad"], sky:["#0a1a0a","#2a4a2a"], top:"🏰" }),
     L("breakout","Castle Wall Breaker","🧱","Wall breaker! Slide your finger to move the paddle. Bounce the magic ball and smash the wall!",{ ball:"🟢", bricks:["#6e7980","#3fa34d","#4a4a4a","#9aa5ad"], bg:"#0a140a" }),
@@ -1816,7 +1816,7 @@ const GAMES = {
   },
   runner(key, sk){
     sk = Object.assign({ obs:"🤖", col:"🔔", sky:["#3b82e2","#a8d8ff"], ground:["#33b05a","#2a8f48"], clouds:true, city:false }, sk);
-    const P = { y:380, vy:0, jumps:0 }; let dist = 0, slow = 0, n = 0, spawn = 1; const obs = []; const GOAL = 15000 * DF();
+    const P = { y:380, vy:0, jumps:0 }; let dist = 0, slow = 0, n = 0, spawn = 1; const obs = []; const GOAL = 21000 * DF();
     /* extras: collect streak, power-ups (🧲 magnet, ⭐ super-star), bonus coin trains, stomping, a finish line */
     let streak = 0, magnet = 0, star = 0, shake = 0, nextPow = 6 + Math.random()*3, nextTrain = 0.32 + Math.random()*.08, trains = 0, fin = false;
     const parts = [], texts = [], banners = [];
@@ -1843,7 +1843,7 @@ const GAMES = {
           banner("BONUS! 🎉"); api.sfx("powerup", .6); }
         if(!fin && spawn <= 0){ spawn = (1.0 + Math.random() * .9) / Math.sqrt(DF());
           nextPow -= 1;
-          if(nextPow <= 0){ nextPow = 10 + Math.random()*5; obs.push({ x: LW + 40, y: 250 + Math.random()*80, pow: Math.random() < .5 ? "🧲" : "⭐" }); }
+          if(nextPow <= 0){ nextPow = 6 + Math.random()*4; obs.push({ x: LW + 40, y: 250 + Math.random()*80, pow: Math.random() < .5 ? "🧲" : "⭐" }); }
           else if(Math.random() < .55) obs.push({ x: LW + 40, y: 385, bad:true }); else obs.push({ x: LW + 40, y: 230 + Math.random()*120 }); }
         obs.forEach(o => { o.x -= v * dt; if(o.dead || o.flag) return;
           if(magnet && !o.bad && !o.pow && o.x > 140 && o.x < 520){ o.x += (160 - o.x) * Math.min(1, dt * 5); o.y += ((P.y - 10) - o.y) * Math.min(1, dt * 5); }
@@ -1895,7 +1895,7 @@ const GAMES = {
   },
   shooter(key, sk){
     sk = Object.assign({ enemy:"🧝", bomb:"❄️", shot:"#5fd33a", bg:"#070b1e", boss:"👾" }, sk);
-    const WAVES = DF() < 1 ? 2 : 3, ZONES = [sk.bg, "#08202a", "#170a2e", "#2a0a18", "#0a2a14"];
+    const WAVES = DF() < 1 ? 3 : 4, ZONES = [sk.bg, "#08202a", "#170a2e", "#2a0a18", "#0a2a14"];
     const WEAP = ["", "SINGLE SHOT", "DOUBLE SHOT!", "SPREAD SHOT!", "LASER BEAM!"];
     const P = { x: LW/2, inv:0 }; let meter = 0, nova = 0, wave = -1, mode = "warp", warpT = 2, foes = [], shots = [], bombs = [], drops = [], weapon = 1, cool = 0, killed = 0, dropCount = 0;
     let banner = null, bannerT = 0, scroll = 0, beamT = 0, boss = null, bossDone = false, stars = Array.from({length:70}, () => ({ x: Math.random()*LW, y: Math.random()*LH, z: .3 + Math.random() }));
@@ -2040,7 +2040,7 @@ const GAMES = {
   whack(key, sk){
     sk = Object.assign({ popper:"💂", bonus:"🎁", fx:"💦", bg:"#2a1040", flags:["#8e5bd6","#3fa34d"] }, sk);
     const holes = []; for(let r=0;r<2;r++) for(let c=0;c<4;c++) holes.push({ x: 130 + c*180, y: 190 + r*160, up:0, dur:1, kind:null, hitT:0 });
-    let score = 0, timer = .8; const GOAL = DN(25);
+    let score = 0, timer = .8; const GOAL = DN(34);
     /* extras: golden poppers (2 points), bombs not to hit, hit streak combo, a FRENZY moment, hammer bonks, particles, pop text, shake */
     let combo = 0, comboT = 0, frenzy = 0, frenzyDone = false, shake = 0, spawned = 0, parts = [], pops = [], bonks = [], lastT = -1, banner = null, bannerT = 0, finale = false;
     const burst = (x, y, col, k, sp) => { if(parts.length > 260) return; for(let i=0;i<k;i++){ const a = Math.random()*7, v = (sp || 260) * (.3 + Math.random()*.8); parts.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v - 120, life: .45 + Math.random()*.4, col }); } };
@@ -2067,7 +2067,7 @@ const GAMES = {
           holes.forEach(h => { if(h.up > 0 && h.kind && Math.abs(p.x - h.x) < 70 && Math.abs(p.y - (h.y - 30)) < 70){
             const k = h.kind, hx = h.x, hy = h.y - 40;
             if(k === "bomb"){ score = Math.max(0, score - 1); combo = 0; shake = .5; api.ouch("boom"); api.sfx("boom", .7); burst(hx, hy, "#ff8a3a", 22, 340); burst(hx, hy, "#333", 12, 200); pop("💥", hx, hy, "#fff", 70); h.kind = null; h.up = 0; h.hitT = 0; return; }
-            if(k === "foe" || k === "gold"){ score += 1; combo++; comboT = 2.2; shake = Math.max(shake, .12);
+            if(k === "foe" || k === "gold"){ score += k === "gold" ? 2 : 1; combo++; comboT = 2.2; shake = Math.max(shake, .12);
               api.sfx(sk.fx === "💦" ? "squirt" : "stomp", .7); api.coin(k === "gold" ? 4 : 1, h.x, h.y - 60);
               burst(hx, hy, k === "gold" ? "#ffd34d" : ["#fff","#7fd8ff","#ff6a9a"][combo % 3], k === "gold" ? 24 : 12);
               if(k === "gold"){ pop("GOLDEN!", hx, hy - 30, "#ffd34d", 42); api.sfx("powerup", .6); }
@@ -2108,7 +2108,7 @@ const GAMES = {
   },
   slice(key, sk){
     sk = Object.assign({ item:null, bg:"#3a1414", stripe:"#5a2020" }, sk);
-    let items = [], spawn = .5, score = 0, trail = []; const GOAL = DN(26);
+    let items = [], spawn = .5, score = 0, trail = []; const GOAL = DN(36);
     /* extras: golden items (2 points), bombs not to slice, multi-slice combos, a FRENZY fan of items, juice splats, pop text, shake */
     let parts = [], pops = [], shake = 0, flash = 0, frenzy = 0, frenzyDone = false, launched = 0, chain = 0, chainT = 0, lastT = -1, banner = null, bannerT = 0, finale = false;
     const JUICE = { "🥚":"#ffd34d", "🥧":"#f5d9a8", "🍉":"#ff4a6a", "🎃":"#ff8a3a" }, juice = JUICE[sk.item] || "#e8f4ff";
@@ -2117,7 +2117,7 @@ const GAMES = {
     const launch = (x, vx, vy, kind) => { launched++; items.push({ x, y: LH + 30, vx, vy, cut:false, half:0, r:34, rot:0, kind }); };
     const cut = (o, api) => { o.cut = true;
       if(o.kind === "bomb"){ o.gone = true; score = Math.max(0, score - 1); chain = 0; shake = .6; flash = .35; api.ouch("boom"); burst(o.x, o.y, "#ff8a3a", 26, 380); burst(o.x, o.y, "#444", 14, 240); pop("💥", o.x, o.y, "#fff", 80); return; }
-      const gold = o.kind === "gold"; score += 1; api.sfx("slice", .7); api.coin(gold ? 4 : 1, o.x, o.y);
+      const gold = o.kind === "gold"; score += gold ? 2 : 1; api.sfx("slice", .7); api.coin(gold ? 4 : 1, o.x, o.y);
       burst(o.x, o.y, gold ? "#ffd34d" : juice, gold ? 22 : 12); if(gold){ burst(o.x, o.y, "#fff", 8, 340); pop("GOLDEN!", o.x, o.y - 40, "#ffd34d", 42); api.sfx("powerup", .6); }
       chain = chainT > 0 ? chain + 1 : 1; chainT = .45;
       if(chain >= 2){ pops = pops.filter(p => !p.combo); pop(`COMBO x${chain}!`, o.x, o.y - (gold ? 80 : 30), "#7fffd4", 28 + Math.min(22, chain * 3)).combo = true; api.sfx("combo", .55, Math.min(2.2, 1 + chain * .1)); if(chain >= 3){ api.coin(chain, o.x, o.y - 30); shake = Math.max(shake, .15); } }
@@ -2262,41 +2262,44 @@ const GAMES = {
   defense(key, sk){
     /* lawn defence: tap a card, then tap the grass to put a defender there. Batteries make ⚡ to pay for more.
        Extras: tap an attacker to ZAP it (short cooldown), rare golden ⚡, a BOSS at the very end, and a victory parade */
-    sk = Object.assign({ attacker:"🤖", castle:"#6e7980", top:"#3fa34d", bolt:"#7fe7ff", bg:"#16251a" }, sk);
+    /* garden defence: plants against zombies (same look for every villain) */
+    sk = Object.assign({}, sk, { attacker:"🧟", castle:"#a8743f", top:"#c8402a", bolt:"#9be04a", bg:"#3f8a34" });
     const ROWS = 5, COLS = 10, RH = 60, Y0 = 58, X0 = 70, CW = 58, BAR = 374, STREET = X0 + COLS * CW;
     const rowY = r => Y0 + r * RH + RH/2, colX = c => X0 + c * CW + CW/2;
     const ALL_CARDS = [
-      { id:"power", e:"⚡", cost:50, cd:6, hp:6 },
-      { id:"shoot", e:null, cost:100, cd:6, hp:6 },
-      { id:"tri", e:null, cost:175, cd:9, hp:6 },
-      { id:"ice", e:null, cost:150, cd:10, hp:6 },
-      { id:"wall", e:"🧱", cost:50, cd:16, hp:70 },
-      { id:"mine", e:"🧨", cost:25, cd:20, hp:3 },
-      { id:"bomb", e:"💣", cost:150, cd:26, hp:99 },
+      { id:"power", e:"🌼", cost:50, cd:7, hp:6 },      /* sun flower: makes ☀️ */
+      { id:"shoot", e:"🌵", cost:100, cd:6, hp:6 },     /* spike shooter */
+      { id:"ice", e:"🌵", cost:175, cd:10, hp:6 },      /* frost shooter: slows */
+      { id:"double", e:"🌵", cost:200, cd:9, hp:6 },    /* twin shooter */
+      { id:"tri", e:"🌿", cost:275, cd:12, hp:6 },      /* fern: shoots 3 lanes */
+      { id:"wall", e:"🎃", cost:50, cd:18, hp:72 },     /* big pumpkin to block them */
+      { id:"mine", e:"🍄", cost:25, cd:18, hp:3 },      /* buried boom mushroom */
+      { id:"bomb", e:"🌶️", cost:150, cd:26, hp:99 },    /* hot pepper: big blast */
     ];
     /* keep it simple: 3 cards (power, blaster, wall); hard also gets ice and bomb */
     /* easy: no power at all, cards are free and just refill themselves */
     const FREE = DF() < 1;
-    const CARDS = FREE ? ALL_CARDS.filter(c => ["shoot", "wall", "bomb"].includes(c.id)).map(c => Object.assign({}, c, { cost: 0, cd: { shoot: 4, wall: 10, bomb: 22 }[c.id] }))
-      : ALL_CARDS.filter(c => c.id !== "mine");   /* normal and hard: 6 kinds of tower */
-    const cardX = i => CARDS.length <= 3 ? 280 + i * 150 : 186 + i * 104;
-    let energy = DF() < 1 ? 200 : DF() > 1.3 ? 100 : 150, sel = null, t0 = 0, skyT = 7, flash = 0, banner = "GET READY… BUILD!", bannerT = 3, shake = 0;
-    const cd = {}; CARDS.forEach(c => cd[c.id] = { bomb:20, wall:8, ice:14, mine:10, tri:16 }[c.id] || 0);
+    const CARDS = FREE ? ALL_CARDS.filter(c => ["shoot", "ice", "wall", "mine", "bomb"].includes(c.id)).map(c => Object.assign({}, c, { cost: 0, cd: { shoot: 4, ice: 7, wall: 10, mine: 12, bomb: 22 }[c.id] }))
+      : ALL_CARDS;   /* normal and hard: all 8 plants */
+    const CHW = CARDS.length > 6 ? 38 : 46;
+    const cardX = i => CARDS.length > 6 ? 168 + i * 82 : 200 + i * 110;
+    let energy = DF() < 1 ? 200 : DF() > 1.3 ? 100 : 150, sel = null, t0 = 0, skyT = 7, flash = 0, banner = "GET READY… PLANT! 🌱", bannerT = 3, shake = 0;
+    const cd = {}; CARDS.forEach(c => cd[c.id] = { bomb:20, wall:8, ice:12, mine:10, tri:20, double:14 }[c.id] || 0);
     const grid = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-    const plows = Array(ROWS).fill(true); let plowing = [];
+    const plows = Array(ROWS).fill(false); let plowing = [];   /* no lawn helpers: a zombie that reaches the house costs a heart */
     let zapCd = 0, zaps = [], pops = [], conf = [], winT = 0, boss = null;
     let foes = [], bolts = [], orbs = [], booms = [], crumbs = [];
     /* the attack plan: a quiet start, then more and tougher attackers, with two big waves */
-    const TOTAL = DF() < 1 ? 16 : DF() > 1.3 ? 34 : 26, plan = [];
+    const TOTAL = DF() < 1 ? 18 : DF() > 1.3 ? 40 : 30, plan = [];
     const big1 = Math.round(TOTAL * .5), big2 = TOTAL - Math.round(TOTAL * .25);
     { let tm = 15; for(let i = 0; i < TOTAL; i++){ const f = i / TOTAL, r = Math.random();
-        let type = "walk"; if(f > .15 && r < .3) type = "helmet"; else if(f > .3 && r < .5) type = "fast"; else if(DF() > 1.3 && f > .45 && r < .62) type = "jumper"; else if(DF() > 1.3 && f > .55 && r < .75) type = "tank";
-        if(i === TOTAL - 1) type = "boss"; if(i === big1 && DF() > 1.3) type = "giant";
+        let type = "walk"; if(f > .12 && r < .25) type = "helmet"; else if(f > .25 && r < .4) type = "fast"; else if(!FREE && f > .35 && r < .52) type = "jumper"; else if(!FREE && f > .5 && r < .64) type = "heavy"; else if(!FREE && f > .6 && r < .74) type = "tank";
+        if(i === TOTAL - 1) type = "boss"; if(i === big1 && DF() >= 1) type = "giant";
         const burst = (i >= big1 && i < big1 + 6) || i >= big2;
         tm += burst ? .8 + Math.random() * .7 : Math.max(2.6, 10 - f * 8) / Math.sqrt(DF()) * (.8 + Math.random() * .4);
         plan.push({ at: tm, type, row: Math.floor(Math.random() * ROWS), flag: i === big1 || i === big2 }); }
       plan[TOTAL - 1].at = Math.max(plan[TOTAL - 1].at, plan[TOTAL - 2].at + 3); }
-    const STATS = { walk:{ hp:7, sp:15, size:42 }, helmet:{ hp:13, sp:15, size:42 }, fast:{ hp:6, sp:28, size:40 }, jumper:{ hp:8, sp:22, size:42 }, tank:{ hp:20, sp:12, size:44 }, giant:{ hp:48, sp:8, size:70 }, boss:{ hp: DF() < 1 ? 40 : 60, sp:7, size:88 } };
+    const STATS = { heavy:{ hp:24, sp:13, size:44 }, walk:{ hp:7, sp:15, size:42 }, helmet:{ hp:13, sp:15, size:42 }, fast:{ hp:6, sp:28, size:40 }, jumper:{ hp:8, sp:22, size:42 }, tank:{ hp:20, sp:12, size:44 }, giant:{ hp:48, sp:8, size:70 }, boss:{ hp: DF() < 1 ? 40 : 60, sp:7, size:88 } };
     let spawned = 0, beaten = 0;
     const say = (s) => { banner = s; bannerT = 2; };
     const pop = (txt, x, y, col) => pops.push({ txt, x, y, t: 1, col: col || "#ffd34d" });
@@ -2320,8 +2323,8 @@ const GAMES = {
         /* taps: grab ⚡ first, then cards, then the grass */
         inp.taps.forEach(p => {
           const orb = orbs.find(o => !o.got && Math.hypot(o.x - p.x, o.y - p.y) < 44);
-          if(orb){ orb.got = true; orb.fly = 0; api.sfx("coin", .5); if(orb.gold){ api.sfx("combo", .6, 1.5); pop("+75 ⚡", orb.x, orb.y - 20); for(let i = 0; i < 10; i++) crumbs.push({ x: orb.x, y: orb.y, vx: Math.cos(i/10*6.28)*200, vy: Math.sin(i/10*6.28)*200, t: .5, col: "#ffd34d" }); } return; }
-          if(p.y > BAR - 4){ const i = CARDS.findIndex((c, i) => Math.abs(p.x - cardX(i)) < 48); if(i >= 0){ const c = CARDS[i];
+          if(orb){ orb.got = true; orb.fly = 0; api.sfx("coin", .5); if(orb.gold){ api.sfx("combo", .6, 1.5); pop("+75 ☀️", orb.x, orb.y - 20); for(let i = 0; i < 10; i++) crumbs.push({ x: orb.x, y: orb.y, vx: Math.cos(i/10*6.28)*200, vy: Math.sin(i/10*6.28)*200, t: .5, col: "#ffd34d" }); } return; }
+          if(p.y > BAR - 4){ const i = CARDS.findIndex((c, i) => Math.abs(p.x - cardX(i)) < CHW + 2); if(i >= 0){ const c = CARDS[i];
               if(sel === c.id){ sel = null; api.sfx("blip", .4); } else if(energy >= c.cost && cd[c.id] <= 0){ sel = c.id; api.sfx("blip", .6); } else api.sfx("wrong", .4); } return; }
           /* tap an attacker: ZAP! */
           const foe = foes.filter(f => !f.dead && Math.hypot(f.x - p.x, rowY(f.row) - (f.type === "giant" || f.type === "boss" ? 12 : 2) - f.jy - p.y) < f.size * .55 + 12).sort((a, b) => Math.hypot(a.x - p.x, rowY(a.row) - p.y) - Math.hypot(b.x - p.x, rowY(b.row) - p.y))[0];
@@ -2347,9 +2350,9 @@ const GAMES = {
         foes.sort((a, b) => a.x - b.x);
         /* defenders */
         for(let r = 0; r < ROWS; r++) for(let c = 0; c < COLS; c++){ const d = grid[r][c]; if(!d) continue; d.pop = Math.max(0, d.pop - dt); d.recoil = Math.max(0, d.recoil - dt); d.glow = Math.max(0, d.glow - dt); d.hit = Math.max(0, (d.hit || 0) - dt);
-          if(d.id === "power"){ d.t -= dt; if(d.t < 1) d.glow = 1; if(d.t <= 0){ d.t = 9; orbs.push({ x: colX(c), y: rowY(r) - 26, ty: rowY(r) - 26, life: 8, v: 25, ph: 0, fromTower: true }); pops.push && pops.push({ txt: "+25 ⚡", x: colX(c), y: rowY(r) - 34, t: 1, col: "#ffd34d" }); api.sfx("popup", .4); d.burst = .4; } }
+          if(d.id === "power"){ d.t -= dt; if(d.t < 1) d.glow = 1; if(d.t <= 0){ d.t = 9; orbs.push({ x: colX(c), y: rowY(r) - 26, ty: rowY(r) - 26, life: 8, v: 25, ph: 0, fromTower: true }); pops.push && pops.push({ txt: "+25 ☀️", x: colX(c), y: rowY(r) - 34, t: 1, col: "#ffd34d" }); api.sfx("popup", .4); d.burst = .4; } }
           if(d.id === "tri"){ d.t -= dt; if(d.t <= 0 && [r - 1, r, r + 1].some(rr => rr >= 0 && rr < ROWS && firstFoeAhead(rr, colX(c)))){ d.t = 1.6; d.recoil = .15; [r - 1, r, r + 1].forEach(rr => { if(rr >= 0 && rr < ROWS) bolts.push({ x: colX(c) + 18, row: rr, tri: true }); }); if(Math.random() < .4) api.sfx("pew", .25); } }
-          if(d.id === "shoot" || d.id === "ice"){ d.t -= dt; if(d.t <= 0 && firstFoeAhead(r, colX(c))){ d.t = 1.4; d.recoil = .15; bolts.push({ x: colX(c) + 18, row: r, ice: d.id === "ice" }); if(Math.random() < .4) api.sfx("pew", .2); } }
+          if(d.id === "shoot" || d.id === "ice" || d.id === "double"){ d.t -= dt; if(d.t <= 0 && firstFoeAhead(r, colX(c))){ d.t = 1.4; d.recoil = .15; bolts.push({ x: colX(c) + 18, row: r, ice: d.id === "ice" }); if(d.id === "double") bolts.push({ x: colX(c) - 4, row: r }); if(Math.random() < .4) api.sfx("pew", .2); } }
           if(d.id === "mine"){ if(d.arm > 0) d.arm -= dt; else { const f = foes.find(f => !f.dead && f.row === r && Math.abs(f.x - colX(c)) < 26 && !f.jy);
               if(f){ grid[r][c] = null; booms.push({ x: colX(c), y: rowY(r), t: .5, small: true }); shake = .25; api.sfx("boom", .8); foes.forEach(g => { if(g.row === r && Math.abs(g.x - colX(c)) < CW * .9) hitFoe(g, 30, api); }); } } }
           if(d.id === "bomb"){ d.fuse -= dt; if(d.fuse <= 0){ grid[r][c] = null; booms.push({ x: colX(c), y: rowY(r), t: .6 }); flash = .3; shake = .5; api.sfx("boom", .9);
@@ -2364,7 +2367,7 @@ const GAMES = {
           f.eating = false;
           if(d && d.id !== "bomb" && !(d.id === "mine") && f.x - 20 < colX(c) + 24){
             if(f.type === "jumper" && !f.jumped && d.id !== "wall"){ f.jumped = true; f.jumping = .001; api.sfx("jump", .4); return; }
-            f.eating = true; f.bite -= dt; if(f.bite <= 0){ f.bite = f.slow ? 1 : .5; d.hp -= f.type === "boss" ? 5 : f.type === "giant" ? 4 : 1; d.hit = .15; api.sfx("crunch", .22); if(d.id === "wall"){ hitFoe(f, 1, api); }   /* spiky wall: biting it hurts */
+            f.eating = true; f.bite -= dt; if(f.bite <= 0){ f.bite = f.slow ? 1 : .5; d.hp -= f.type === "boss" ? 5 : f.type === "giant" ? 4 : 1; d.hit = .15; api.sfx("crunch", .22); 
               crumbs.push({ x: colX(c) + 14, y: rowY(f.row), vx: Math.random()*80, vy: -Math.random()*100, t: .4, col: "#c8a070" }); if(d.hp <= 0) grid[f.row][c] = null; } }
           else f.x -= spd * dt;
           if(f.x < X0 - 6){ if(plows[f.row]){ plows[f.row] = false; plowing.push({ row: f.row, x: 20 }); api.sfx("speed", .8); }
@@ -2378,7 +2381,7 @@ const GAMES = {
       draw(ctx, t){
         const sx = shake ? (Math.random()-.5)*8 : 0; ctx.save(); ctx.translate(sx, 0);
         /* sky strip, lawn, street */
-        const g = ctx.createLinearGradient(0, 0, 0, Y0); g.addColorStop(0, "#0b1430"); g.addColorStop(1, "#24365e"); ctx.fillStyle = g; ctx.fillRect(-10, 0, LW + 20, Y0);
+        const g = ctx.createLinearGradient(0, 0, 0, Y0); g.addColorStop(0, "#5aa8e8"); g.addColorStop(1, "#a8d8ff"); ctx.fillStyle = g; ctx.fillRect(-10, 0, LW + 20, Y0);
         ctx.fillStyle = sk.bg; ctx.fillRect(-10, Y0 - 4, LW + 20, LH);
         for(let r = 0; r < ROWS; r++) for(let c = 0; c < COLS; c++){ ctx.fillStyle = (r + c) % 2 ? "rgba(120,200,90,.16)" : "rgba(120,200,90,.26)"; ctx.fillRect(X0 + c*CW, Y0 + r*RH, CW, RH); }
         ctx.fillStyle = "#3a3a46"; ctx.fillRect(STREET + 6, Y0 - 4, LW - STREET, ROWS * RH + 8); ctx.fillStyle = "#6a6a76"; ctx.fillRect(STREET, Y0 - 4, 8, ROWS * RH + 8);
@@ -2386,30 +2389,34 @@ const GAMES = {
         ctx.fillStyle = "#2a4a2a"; for(let i = 0; i < 16; i++){ ctx.beginPath(); ctx.arc(X0 + i * 38 + 10, Y0 - 2, 12, Math.PI, 0); ctx.fill(); }
         if(sel){ ctx.strokeStyle = `rgba(255,230,120,${.35 + .2*Math.sin(t*6)})`; ctx.lineWidth = 2; for(let r = 0; r < ROWS; r++) for(let c = 0; c < COLS; c++) if(!grid[r][c]) ctx.strokeRect(X0 + c*CW + 4, Y0 + r*RH + 4, CW - 8, RH - 8); }
         /* castle wall on the left, with a snow plow per lane */
-        ctx.fillStyle = sk.castle; ctx.fillRect(-10, Y0 - 20, 46, ROWS * RH + 30); ctx.fillStyle = sk.top; for(let i = 0; i < 7; i++) ctx.fillRect(0, Y0 - 24 + i * 50, 36, 8);
+        /* the house you're defending */
+        ctx.fillStyle = sk.castle; ctx.fillRect(-10, Y0 - 10, 50, ROWS * RH + 20); ctx.fillStyle = "rgba(0,0,0,.2)"; for(let i = 0; i < 12; i++) ctx.fillRect(-10, Y0 - 6 + i * 26, 50, 3);
+        ctx.fillStyle = sk.top; ctx.beginPath(); ctx.moveTo(-14, Y0 - 8); ctx.lineTo(48, Y0 - 8); ctx.lineTo(18, Y0 - 46); ctx.closePath(); ctx.fill();
+        ctx.fillStyle = "#ffe9a8"; for(let r = 0; r < ROWS; r++){ ctx.fillRect(8, rowY(r) - 10, 20, 18); ctx.strokeStyle = "#6a4a2a"; ctx.lineWidth = 2; ctx.strokeRect(8, rowY(r) - 10, 20, 18); }
+        drawHead(ctx, key, 18, Y0 - 24, 12);
         for(let r = 0; r < ROWS; r++) if(plows[r]){ ctx.save(); ctx.translate(54, rowY(r) + 4); ctx.rotate(Math.PI / 4); emoji(ctx, "🚀", 0, 0, 26); ctx.restore(); }
         plowing.forEach(pw => { const y = rowY(pw.row) + 4 - (pw.parade ? Math.abs(Math.sin(t * 10 + pw.row)) * 8 : 0);
-          ctx.fillStyle = `rgba(255,${140 + Math.random() * 80},40,.85)`; ctx.beginPath(); ctx.moveTo(pw.x - 18, y - 7); ctx.lineTo(pw.x - 50 - Math.random() * 20, y); ctx.lineTo(pw.x - 18, y + 7); ctx.fill();
-          ctx.save(); ctx.translate(pw.x, y); ctx.rotate(Math.PI / 4); emoji(ctx, "🚀", 0, 0, 40); ctx.restore(); if(pw.parade) emoji(ctx, "🎉", pw.x + 6, rowY(pw.row) - 26, 22); });
+          if(!pw.parade){ ctx.fillStyle = `rgba(255,${140 + Math.random() * 80},40,.85)`; ctx.beginPath(); ctx.moveTo(pw.x - 18, y - 7); ctx.lineTo(pw.x - 50 - Math.random() * 20, y); ctx.lineTo(pw.x - 18, y + 7); ctx.fill(); }
+          ctx.save(); ctx.translate(pw.x, y); if(pw.parade){ ctx.rotate(Math.sin(t * 8 + pw.row) * .2); emoji(ctx, "🌻", 0, 0, 40); } else { ctx.rotate(Math.PI / 4); emoji(ctx, "🚀", 0, 0, 40); } ctx.restore(); if(pw.parade) emoji(ctx, "🎉", pw.x + 6, rowY(pw.row) - 26, 22); });
         for(let r = 0; r < ROWS; r++) for(let c = 0; c < COLS; c++){ const d = grid[r][c]; if(!d) continue; const x = colX(c), y = rowY(r), s = 1 + d.pop * 1.2, bob = Math.sin(t*3 + c + r) * 1.5;
           ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(x, y + 22, 18, 5, 0, 0, 7); ctx.fill();
           ctx.save(); ctx.translate(x - d.recoil * 20, y + bob); ctx.scale(s, s * (1 - d.recoil)); if(d.hit > 0) ctx.globalAlpha = .6;
-          if(d.id === "tri"){ ctx.fillStyle = "#3a3a48"; [-10, 2, 14].forEach((yy, k) => { ctx.save(); ctx.rotate((k - 1) * .35); ctx.fillRect(-2, yy - 4, 26, 6); ctx.fillStyle = sk.bolt; ctx.fillRect(18, yy - 3, 6, 4); ctx.fillStyle = "#3a3a48"; ctx.restore(); }); drawHead(ctx, key, -6, 0, 15); }
-          else if(d.id === "shoot" || d.id === "ice"){ ctx.fillStyle = "#3a3a48"; ctx.fillRect(-2, 2, 26, 8); ctx.fillStyle = d.id === "ice" ? "#bfe9ff" : sk.bolt; ctx.fillRect(18, 3, 7, 6); drawHead(ctx, key, -4, 0, 15); if(d.id === "ice") emoji(ctx, "❄️", -14, -14, 16); }
-          else if(d.id === "bomb"){ const k = 1 + (1 - d.fuse) * .5 + Math.sin(t*30)*.06; ctx.scale(k, k); emoji(ctx, "💣", 0, 0, 34); }
-          else if(d.id === "mine"){ if(d.arm > 0){ ctx.globalAlpha = .7; emoji(ctx, "🧨", 0, 10, 22); ctx.fillStyle = "#6a4a2a"; ctx.beginPath(); ctx.ellipse(0, 18, 16, 6, 0, 0, 7); ctx.fill(); }
-            else { emoji(ctx, "🧨", 0, 6, 28); if(Math.floor(t*3) % 2){ ctx.fillStyle = "#ff3a3a"; ctx.beginPath(); ctx.arc(8, -6, 4, 0, 7); ctx.fill(); } } }
+          if(d.id === "tri"){ emoji(ctx, "🌿", 0, 0, 38); ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 13px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText("x3", 16, -16); }
+          else if(d.id === "shoot") emoji(ctx, "🌵", 0, 0, 38);
+          else if(d.id === "ice"){ ctx.fillStyle = "rgba(150,210,255,.35)"; ctx.beginPath(); ctx.arc(0, 0, 20, 0, 7); ctx.fill(); emoji(ctx, "🌵", 0, 0, 36); emoji(ctx, "❄️", 12, -14, 16); }
+          else if(d.id === "double"){ emoji(ctx, "🌵", -8, 2, 30); emoji(ctx, "🌵", 9, -2, 30); }
+          else if(d.id === "bomb"){ const k = 1 + (1 - d.fuse) * .6 + Math.sin(t*30)*.08; ctx.scale(k, k); emoji(ctx, "🌶️", 0, 0, 34); }
+          else if(d.id === "mine"){ if(d.arm > 0){ ctx.fillStyle = "#6a4a2a"; ctx.beginPath(); ctx.ellipse(0, 16, 16, 6, 0, 0, 7); ctx.fill(); ctx.globalAlpha = .75; emoji(ctx, "🍄", 0, 10, 18); }
+            else { emoji(ctx, "🍄", 0, 4, 30); if(Math.floor(t*3) % 2){ ctx.fillStyle = "#ff3a3a"; ctx.beginPath(); ctx.arc(0, -12, 4, 0, 7); ctx.fill(); } } }
           else if(d.id === "power"){ const k = 1 - Math.max(0, d.t) / 9;
-            ctx.fillStyle = "#2a2a3a"; ctx.beginPath(); ctx.moveTo(-14, 20); ctx.lineTo(14, 20); ctx.lineTo(8, -8); ctx.lineTo(-8, -8); ctx.closePath(); ctx.fill();
-            ctx.fillStyle = `rgba(255,220,80,${.25 + .35 * k + (d.glow ? .2 * Math.sin(t * 20) : 0)})`; ctx.beginPath(); ctx.arc(0, -14, 16, 0, 7); ctx.fill();
-            ctx.strokeStyle = "#ffd34d"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, -14, 19, -Math.PI / 2, -Math.PI / 2 + k * Math.PI * 2); ctx.stroke();
-            emoji(ctx, "⚡", 0, -14, 22 + (d.burst ? 10 : 0)); d.burst = Math.max(0, (d.burst || 0) - .02); }
-          else { emoji(ctx, "🧱", 0, 0, 40);
-            ctx.fillStyle = "#cfd6db"; for(let k = 0; k < 3; k++){ ctx.beginPath(); ctx.moveTo(18, -14 + k * 12); ctx.lineTo(28, -9 + k * 12); ctx.lineTo(18, -4 + k * 12); ctx.closePath(); ctx.fill(); }
-            if(d.id === "wall" && d.hp < d.max * .6){ ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-8, -14); ctx.lineTo(0, -2); ctx.lineTo(-4, 8); if(d.hp < d.max * .3){ ctx.moveTo(10, -12); ctx.lineTo(4, 4); } ctx.stroke(); } }
+            ctx.strokeStyle = "#ffd34d"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, -2, 22, -Math.PI / 2, -Math.PI / 2 + k * Math.PI * 2); ctx.stroke();
+            if(d.glow){ ctx.fillStyle = `rgba(255,220,80,${.3 + .2 * Math.sin(t * 20)})`; ctx.beginPath(); ctx.arc(0, -2, 20, 0, 7); ctx.fill(); }
+            ctx.save(); ctx.rotate(Math.sin(t * 2 + c) * .12); emoji(ctx, "🌼", 0, -2, 34 + (d.burst ? 8 : 0)); ctx.restore(); d.burst = Math.max(0, (d.burst || 0) - .02); }
+          else { emoji(ctx, "🎃", 0, 0, 42);
+            if(d.hp < d.max * .6){ ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-8, -14); ctx.lineTo(0, -2); ctx.lineTo(-4, 8); if(d.hp < d.max * .3){ ctx.moveTo(10, -12); ctx.lineTo(4, 4); } ctx.stroke(); } }
           ctx.restore();
           if(d.hp < d.max && d.id !== "bomb" && d.id !== "mine"){ ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(x - 20, y + 24, 40, 4); ctx.fillStyle = "#3fd34a"; ctx.fillRect(x - 20, y + 24, 40 * d.hp / d.max, 4); } }
-        bolts.forEach(b => { const y = rowY(b.row) + 6; ctx.fillStyle = b.ice ? "#bfe9ff" : sk.bolt; ctx.beginPath(); ctx.arc(b.x, y, 6, 0, 7); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.beginPath(); ctx.arc(b.x + 2, y - 2, 2.5, 0, 7); ctx.fill(); });
+        bolts.forEach(b => { const y = rowY(b.row) - 2; ctx.fillStyle = b.ice ? "#bfe9ff" : sk.bolt; ctx.beginPath(); ctx.arc(b.x, y, 6, 0, 7); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.beginPath(); ctx.arc(b.x + 2, y - 2, 2.5, 0, 7); ctx.fill(); });
         foes.slice().sort((a,b) => a.row - b.row).forEach(f => { const y = rowY(f.row) - (f.type === "giant" || f.type === "boss" ? 12 : 2) - f.jy;
           const walk = f.eating ? 0 : Math.sin(f.ph) * 2.5, tilt = f.eating ? Math.sin(t * 14) * .15 : Math.sin(f.ph) * .07;
           ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(f.x, rowY(f.row) + 22, f.size * .4, 5, 0, 0, 7); ctx.fill();
@@ -2425,7 +2432,8 @@ const GAMES = {
           if(f.type === "tank") emoji(ctx, "🛡️", -16, 6, 26);
           if(f.type === "giant") emoji(ctx, "👑", 0, -38, 26);
           if(f.type === "fast") emoji(ctx, "👟", 4, 18, 15);
-          if(f.type === "jumper" && !f.jumped) emoji(ctx, "🪃", 14, 10, 16);
+          if(f.type === "jumper" && !f.jumped){ ctx.strokeStyle = "#c8a060"; ctx.lineWidth = 4; ctx.beginPath(); ctx.moveTo(-6, 24); ctx.lineTo(-22, -30); ctx.stroke(); }
+          if(f.type === "heavy") emoji(ctx, "🪖", 0, -f.size * .44, 26);
           if(f.slow){ ctx.fillStyle = "rgba(150,210,255,.35)"; ctx.beginPath(); ctx.arc(0, 0, f.size * .5, 0, 7); ctx.fill(); }
           ctx.restore(); ctx.globalAlpha = 1;
           if(f.hp < f.max && !f.dead && f.type !== "boss"){ ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(f.x - 16, y - f.size/2 - 8, 32, 4); ctx.fillStyle = "#ff5a3a"; ctx.fillRect(f.x - 16, y - f.size/2 - 8, 32 * Math.max(0, f.hp) / f.max, 4); } });
@@ -2433,7 +2441,7 @@ const GAMES = {
         booms.forEach(b => { const R = b.small ? 60 : 120; ctx.fillStyle = `rgba(255,170,60,${b.t})`; ctx.beginPath(); ctx.arc(b.x, b.y, (1 - b.t/.6) * R + 20, 0, 7); ctx.fill(); emoji(ctx, "💥", b.x, b.y, b.small ? 60 : 90); });
         orbs.forEach(o => { const G = o.gold ? 1.6 : 1; ctx.fillStyle = o.gold ? `hsla(${45 + Math.sin(t*6)*10},100%,60%,.6)` : "rgba(255,230,80,.35)"; ctx.beginPath(); ctx.arc(o.x, o.y, (22 + Math.sin(t*8)*3) * G, 0, 7); ctx.fill();
           if(o.gold){ ctx.strokeStyle = "#fff6b0"; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(o.x, o.y, 38 + Math.sin(t*8)*4, 0, 7); ctx.stroke(); for(let i = 0; i < 4; i++){ const a = t * 3 + i * 1.57; emoji(ctx, "✨", o.x + Math.cos(a) * 42, o.y + Math.sin(a) * 42, 16); } }
-          emoji(ctx, "⚡", o.x, o.y, 30 * G); });
+          emoji(ctx, "☀️", o.x, o.y, 30 * G); });
         /* zap bolts from the sky */
         zaps.forEach(z => { ctx.strokeStyle = `rgba(255,250,150,${z.t / .3})`; ctx.lineWidth = 6; ctx.beginPath(); let yy = 0, xx = z.x; ctx.moveTo(xx, 0); for(let i = 1; i <= 6; i++){ yy = z.y * i / 6; xx = z.x + (i < 6 ? Math.sin(z.seed + i * 2.3) * 22 : 0); ctx.lineTo(xx, yy); } ctx.stroke(); ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
           ctx.fillStyle = `rgba(255,255,160,${z.t * 2})`; ctx.beginPath(); ctx.arc(z.x, z.y, 34 * (1 - z.t / .3) + 14, 0, 7); ctx.fill(); });
@@ -2442,16 +2450,19 @@ const GAMES = {
         ctx.restore();
         /* the card tray */
         ctx.fillStyle = "rgba(20,14,8,.85)"; ctx.fillRect(0, BAR - 4, LW, LH - BAR + 4);
-        if(!FREE){ ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(14, BAR + 6, 110, 58, 12) : ctx.rect(14, BAR + 6, 110, 58); ctx.fill();
-        ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 28px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText(`⚡${energy}`, 69, BAR + 46); }
+        if(!FREE){ ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(10, BAR + 6, 114, 58, 12) : ctx.rect(10, BAR + 6, 114, 58); ctx.fill();
+        ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 28px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText(`☀️${energy}`, 67, BAR + 46); }
         CARDS.forEach((c, i) => { const x = cardX(i), ok = energy >= c.cost && cd[c.id] <= 0, on = sel === c.id, lift = on ? -6 : 0;
-          ctx.fillStyle = on ? "#f2c14e" : ok ? "#3a4a6e" : "#1f2433"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - 46, BAR + 4 + lift, 92, 64, 10) : ctx.rect(x - 46, BAR + 4 + lift, 92, 64); ctx.fill();
+          ctx.fillStyle = on ? "#f2c14e" : ok ? "#3a4a6e" : "#1f2433"; ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x - CHW, BAR + 4 + lift, CHW * 2, 64, 10) : ctx.rect(x - CHW, BAR + 4 + lift, CHW * 2, 64); ctx.fill();
           if(ok && !on){ ctx.strokeStyle = "rgba(255,255,255,.35)"; ctx.lineWidth = 2; ctx.stroke(); }
           ctx.globalAlpha = ok || on ? 1 : .4;
-          if(c.e) emoji(ctx, c.e, x, BAR + 28 + lift, 30); else { drawHead(ctx, key, x, BAR + 26 + lift, 14); if(c.id === "ice") emoji(ctx, "❄️", x + 16, BAR + 14 + lift, 16); if(c.id === "tri"){ ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 15px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText("x3", x + 22, BAR + 16 + lift); } }
-          ctx.fillStyle = on ? "#1b1b1b" : "#ffd34d"; ctx.font = 'bold 17px Nunito, sans-serif'; ctx.textAlign = "center"; if(!FREE) ctx.fillText(`⚡${c.cost}`, x, BAR + 62 + lift);
+          if(c.id === "double"){ emoji(ctx, "🌵", x - 9, BAR + 28 + lift, 24); emoji(ctx, "🌵", x + 9, BAR + 28 + lift, 24); }
+          else emoji(ctx, c.e, x, BAR + 28 + lift, 30);
+          if(c.id === "ice") emoji(ctx, "❄️", x + 15, BAR + 14 + lift, 16);
+          if(c.id === "tri"){ ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 14px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText("x3", x + 20, BAR + 16 + lift); }
+          ctx.fillStyle = on ? "#1b1b1b" : "#ffd34d"; ctx.font = 'bold 17px Nunito, sans-serif'; ctx.textAlign = "center"; if(!FREE) ctx.fillText(`☀️${c.cost}`, x, BAR + 62 + lift);
           ctx.globalAlpha = 1;
-          if(cd[c.id] > 0){ const k = cd[c.id] / c.cd; ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(x - 46, BAR + 4, 92, 64 * Math.min(1, k)); } });
+          if(cd[c.id] > 0){ const k = cd[c.id] / c.cd; ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(x - CHW, BAR + 4, CHW * 2, 64 * Math.min(1, k)); } });
         /* wave meter: flags mark the big waves */
         const mx = LW - 216, mw = 200; ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(mx, 14, mw, 14); ctx.fillStyle = "#5fd33a"; ctx.fillRect(mx + mw - mw * (spawned / TOTAL), 16, mw * (spawned / TOTAL), 10);
         [big1, big2].forEach(i => emoji(ctx, "🚩", mx + mw - mw * (i / TOTAL), 14, 18)); emoji(ctx, sk.attacker, mx + mw - mw * (spawned / TOTAL), 22, 20);
@@ -2833,7 +2844,7 @@ const GAMES = {
     const dots = {}; let total = 0, eaten = 0;
     const start = { r:6, c:1 }, home = { r:4, c:7 };
     M.forEach((row,r) => [...row].forEach((ch,c) => { if((ch === "." || ch === "o") && !(r === start.r && c === start.c)){ dots[r+","+c] = ch; total++; } }));
-    const GOAL = Math.ceil(total * .7);
+    const GOAL = Math.ceil(total * .85);
     const mk = (r,c,sp) => ({ r, c, tr:r, tc:c, t:1, dr:0, dc:0, sp });
     const P = Object.assign(mk(start.r, start.c, 5), { glide:null, inv:0, boost:0 }); window.__pacP = P;
     const SPD = 2.35 * DF();   /* always slower than Henry (5): easy 1.6, normal 2.35, hard 3.3 */
@@ -2959,7 +2970,7 @@ const GAMES = {
   },
   pong(key, sk){
     sk = Object.assign({ ball:null, opp:"🤖", bg:"#0a1a2a", net:"rgba(255,255,255,.3)", paddle:null, opPaddle:"#e23b3b" }, sk);
-    const GOAL = DF() < 1 ? 4 : DF() > 1.3 ? 6 : 5;
+    const GOAL = DF() < 1 ? 5 : DF() > 1.3 ? 8 : 7;
     const PH0 = DF() < 1 ? 160 : DF() > 1.3 ? 115 : 135, AIH0 = 100;
     let PH = PH0, AIH = AIH0;
     const P = { y: LH/2, big: 0, fire: false }, A = { y: LH/2, err: 0, tiny: 0 };
@@ -2996,7 +3007,7 @@ const GAMES = {
           pw.born += dt; pw.cx = pw.x + Math.sin(pw.born * 2) * 18;
           const near = balls.filter(b => b.wait <= 0).sort((a, b) => Math.abs(a.x - pw.x) - Math.abs(b.x - pw.x))[0];
           if(pw.y < 60) pw.y += 90 * dt; else if(near){ const dy = near.y - pw.y; pw.y += Math.sign(dy) * Math.min(Math.abs(dy), 55 * dt); }
-          if(pw.born > 14){ burst(pw.cx, pw.y, "#888", 10, 100); pw = null; pwT = 8 + Math.random() * 5; } }
+          if(pw.born > 14){ burst(pw.cx, pw.y, "#888", 10, 100); pw = null; pwT = 3 + Math.random() * 3; } }
         for(let i = balls.length - 1; i >= 0; i--){
           const B = balls[i];
           if(B.wait > 0){ B.wait -= dt; continue; }
@@ -3018,11 +3029,11 @@ const GAMES = {
           /* the ball grabs the power-up for Henry */
           if(pw && Math.hypot(B.x - (pw.cx || pw.x), B.y - pw.y) < 48){
             api.sfx("powerup", .8); const px = pw.cx || pw.x; burst(px, pw.y, "#fff", 20, 220); burst(px, pw.y, "#ffd34d", 14, 180); shake = .15;
-            if(pw.kind === "big"){ P.big = 6; pop("BIG! 🍄", pw.x, pw.y, "#5fd3a5", 40); }
+            if(pw.kind === "big"){ P.big = 5; pop("BIG! 🍄", pw.x, pw.y, "#5fd3a5", 40); }
             else if(pw.kind === "fire"){ P.fire = true; pop("🔥 READY!", pw.x, pw.y, "#ff9a3a", 40); }
-            else if(pw.kind === "shrink"){ A.tiny = 6; pop("TINY! 🐜", pw.x, pw.y, "#ff6a6a", 40); api.sfx("wrong", .3, 1.6); }
-            else if(pw.kind === "multi"){ pop("MULTI BALL!", pw.x, pw.y, "#7fd8ff", 40); for(let n = 0; n < 1; n++){ const a = (Math.random() < .5 ? .5 : -.5) + (Math.random() - .5) * .3; balls.push(mkBall(pw.x, pw.y, Math.cos(a), Math.sin(a), BASE * 1.05)); } }
-            pw = null; pwT = 9 + Math.random() * 5;
+            else if(pw.kind === "shrink"){ A.tiny = 5; pop("TINY! 🐜", pw.x, pw.y, "#ff6a6a", 40); api.sfx("wrong", .3, 1.6); }
+            else if(pw.kind === "multi"){ pop("MULTI BALL!", pw.x, pw.y, "#7fd8ff", 40); for(let n = 0; n < 2; n++){ const a = (n ? .5 : -.5) + (Math.random() - .5) * .3; balls.push(mkBall(pw.x, pw.y, Math.cos(a), Math.sin(a), BASE * 1.05)); } }
+            pw = null; pwT = 3.5 + Math.random() * 3;
           }
           if(B.x > LW + 20){
             mine++; missRow = 0; balls.splice(i, 1);
@@ -3069,7 +3080,7 @@ const GAMES = {
   },
   catch(key, sk){
     sk = Object.assign({ good:"🪙", bad:"💣", sky:["#14205a","#3a5aa0"], ground:"#f4f8fc" }, sk);
-    const P = { x: LW/2, magnet: 0, shield: false, squash: 0 }; let items = [], spawn = .4, got = 0, streak = 0, shake = 0, banner = null, specT = 5 + Math.random() * 3; const GOAL = DN(26);
+    const P = { x: LW/2, magnet: 0, shield: false, squash: 0 }; let items = [], spawn = .4, got = 0, streak = 0, shake = 0, banner = null, specT = 5 + Math.random() * 3; const GOAL = DN(36);
     /* juice: particles and pop words */
     const fx = [], pops = [];
     const burst = (x, y, col, n, sp) => { for(let i = 0; i < n; i++){ const a = Math.random()*7, v = (sp || 160) * (.4 + Math.random()); fx.push({ x, y, vx: Math.cos(a)*v, vy: Math.sin(a)*v - 60, t: .6 + Math.random()*.5, col: col || "#ffd34d", s: 3 + Math.random()*5 }); } };
@@ -3085,7 +3096,7 @@ const GAMES = {
         if(banner){ banner.t -= dt; if(banner.t <= 0) banner = null; }
         P.x += inp.ddx * 1.5 + inp.hx() * 420 * dt; P.x = Math.max(50, Math.min(LW-50, P.x));
         spawn -= dt; if(spawn <= 0){ spawn = .55 + Math.random()*.4; items.push({ x: 60 + Math.random()*(LW-120), y: -30, bad: Math.random() < .25 * DF(), vy: (150 + Math.random()*90 + got*4) * DF(), r: Math.random()*6 }); }
-        specT -= dt; if(specT <= 0){ specT = 10 + Math.random() * 5; if(!bag.length) bag = shuffle(SPECIALS.slice()); items.push({ x: 80 + Math.random()*(LW-160), y: -40, bad:false, sp: bag.pop(), vy: 140 + Math.random()*40, r: 0 }); api.sfx("popup", .5, 1.4); }
+        specT -= dt; if(specT <= 0){ specT = 6 + Math.random() * 4; if(!bag.length) bag = shuffle(SPECIALS.slice()); items.push({ x: 80 + Math.random()*(LW-160), y: -40, bad:false, sp: bag.pop(), vy: 140 + Math.random()*40, r: 0 }); api.sfx("popup", .5, 1.4); }
         items.forEach(o => {
           /* magnet pulls the good stuff toward the basket */
           if(P.magnet > 0 && !o.bad && o.y > 60 && o.y < 380) o.x += Math.sign(P.x - o.x) * Math.min(Math.abs(P.x - o.x), 360 * dt);
@@ -3099,7 +3110,7 @@ const GAMES = {
             else if(o.sp === "magnet"){ P.magnet = 4; api.sfx("powerup", .8); pop("🧲 MAGNET!", P.x, 300, "#ff6a6a", 38); burst(P.x, 360, "#ff6a6a", 20, 200); }
             else if(o.sp === "shield"){ P.shield = true; api.sfx("powerup", .8); pop("🛡️", P.x, 300, "#7fd8ff", 54); burst(P.x, 360, "#7fd8ff", 20, 200); }
             else {
-              const n = o.sp === "gold" ? 2 : 1; got = Math.min(GOAL, got + 1); streak++;
+              const n = o.sp === "gold" ? 2 : 1; got = Math.min(GOAL, got + n); streak++;
               api.sfx("coin", .6); if(streak >= 3) api.sfx("combo", .5, 1 + Math.min(streak - 3, 12) * .07);
               api.coin(n, o.x, 330); burst(o.x, 370, o.sp === "gold" ? "#ffd34d" : "#fff", o.sp === "gold" ? 30 : 10, o.sp === "gold" ? 260 : 140);
               if(o.sp === "gold"){ api.sfx("victory", .5); pop("MEGA! x2", P.x, 290, "#ffd34d", 44); shake = .2; api.coin(3, P.x, 300); }
@@ -3141,7 +3152,7 @@ const GAMES = {
   },
   fly(key, sk){
     sk = Object.assign({ pipe:"#3fa34d", pipe2:"#2a7a3a", col:"⭐", sky:["#3b82e2","#a8d8ff"], ride:null }, sk);
-    const P = { y: LH/2, vy:0 }; let pipes = [], spawn = .2, passed = 0, cols = 0; const GOAL = DN(18), GAP = Math.round(200 / Math.sqrt(DF()));
+    const P = { y: LH/2, vy:0 }; let pipes = [], spawn = .2, passed = 0, cols = 0; const GOAL = DN(24), GAP = Math.round(200 / Math.sqrt(DF()));
     /* extras: pass streak, power-ups in the gaps (🌈 rainbow = ghost through pipes, 🫧 bubble = one free bump), a bonus coin river, golden last pipe */
     let made = 0, streak = 0, rainbow = 0, bubble = 0, shake = 0, river = false; const BONUS_AT = Math.max(3, Math.floor(GOAL / 2));
     const parts = [], texts = [], banners = [], fw = [];
@@ -3212,7 +3223,7 @@ const GAMES = {
     const X = [LW/2 - 150, LW/2, LW/2 + 150]; const P = { lane:1, x:X[1], inv:0, air:0, spin:0 };
     let objs = [], spawn = .5, dist = 0, n = 0, boost = 0, shield = false, magnet = 0, fog = 0, banner = null, bannerT = 0, lines = [], pick = 0;
     let streak = 0, close = 0, pops = [], conf = [], shake = 0, finT = 0, rivals = [], rivalNext = 0, passedR = 0, stretch = false, lastV = 300;
-    const GOAL = 14000 * DF();
+    const GOAL = 20000 * DF();
     const POW = [
       { e:"🚀", k:"boost", w:3 }, { e:"🛡️", k:"shield", w:3 }, { e:"🧲", k:"magnet", w:3 }, { e:"🛤️", k:"ramp", w:2 },
       { e:"🛢️", k:"oil", w:3, bad:true }, { e:"⛈️", k:"storm", w:2, bad:true } ];
@@ -3255,7 +3266,7 @@ const GAMES = {
         rivals = rivals.filter(r => r.ahead > -500);
         spawn -= dt; if(spawn <= 0){ spawn = (.5 + Math.random()*.35) / Math.sqrt(DF());
           const r = Math.random(), lane = Math.floor(Math.random()*3);
-          if(r < .07){ objs.push({ lane, y: -40, kind:"pow", pow: pickPow() }); }
+          if(r < .12){ objs.push({ lane, y: -40, kind:"pow", pow: pickPow() }); }
           else if(r < .62){ const o = { lane, y: -40, kind:"bad" }; objs.push(o);   /* obstacles stay in their own lane */
             if(DF() > 1.3 && Math.random() < .25) objs.push({ lane: (lane + 1 + Math.floor(Math.random()*2)) % 3, y: -40, kind:"bad" }); }
           else { for(let k = 0; k < 3; k++) objs.push({ lane, y: -40 - k*55, kind:"col" }); } }
@@ -3360,7 +3371,7 @@ const GAMES = {
       k.alive = false; broke++;
       const cx = k.x + 37, cy = k.y + 15; burst(cx, cy, k.col, 12, 160);
       if(k.sp === "star"){ api.sfx("powerup", .6); api.coin(3, cx, cy); drop(cx, cy); burst(cx, cy, "#ffd34d", 16, 220); pop("⭐", cx, cy, "#ffd34d", 40); }
-      else { api.coin(1, cx, k.y); if(k.sp !== "bomb" && Math.random() < .06) drop(cx, cy); }
+      else { api.coin(1, cx, k.y); if(k.sp !== "bomb" && Math.random() < .12) drop(cx, cy); }
       if(k.sp === "bomb"){
         api.sfx("boom", .8); shake = .45; burst(cx, cy, "#ff9a3a", 30, 300); burst(cx, cy, "#fff", 14, 200); pop("BOOM!", cx, cy, "#ff6a2a", 46);
         bricks.forEach(o => { if(o.alive && Math.abs(o.r - k.r) <= 1 && Math.abs(o.c - k.c) <= 1) kill(o, api, "bomb"); });
@@ -3381,7 +3392,7 @@ const GAMES = {
         for(let i = drops.length - 1; i >= 0; i--){ const d = drops[i]; d.y += d.vy * dt;
           if(d.y > 372 && d.y < 412 && Math.abs(d.x - P.x) < PW/2 + 20){
             drops.splice(i, 1); api.sfx("powerup", .8); burst(d.x, 390, "#fff", 18, 200); shake = .15;
-            if(d.kind === "wide"){ P.wide = 7; pop("BIG! 🍄", d.x, 340, "#5fd3a5", 40); }
+            if(d.kind === "wide"){ P.wide = 6; pop("BIG! 🍄", d.x, 340, "#5fd3a5", 40); }
             else if(d.kind === "fire"){ fire = 5; api.sfx("whoosh", .7); banner = { txt:"🔥 FIREBALL! 🔥", t:1.2, col:"#ff9a3a" }; }
             else { const src = balls.find(b => !b.stuck) || balls[0]; const sp = Math.max(300, Math.hypot(src.vx, src.vy) || 380);
               [-.6, .6].forEach(a => balls.push({ x: src.stuck ? P.x : src.x, y: src.stuck ? 360 : src.y, vx: Math.sin(a) * sp, vy: -Math.cos(a) * sp, stuck:false, trail:[] }));
@@ -3434,7 +3445,7 @@ const GAMES = {
   },
   throw(key, sk){
     sk = Object.assign({ proj:"🪨", target:"⛄", block:"#8a6a4a", sky:["#3b82e2","#a8d8ff"], ground:"#3fa34d" }, sk);
-    const O = { x:130, y:330 }; let targets = [], shots = [], aim = null, hits = 0, round = 0; const ROUNDS = DF() < 1 ? 2 : DF() > 1.3 ? 4 : 3; const GOAL = ROUNDS * 3;
+    const O = { x:130, y:330 }; let targets = [], shots = [], aim = null, hits = 0, round = 0; const ROUNDS = DF() < 1 ? 3 : DF() > 1.3 ? 5 : 4; const GOAL = ROUNDS * 3;
     /* extras: one throw can smash through several targets (DOUBLE! TRIPLE!), a golden balloon that gives MEGA throws,
        knocked-off targets fly away, PERFECT round bonus, round-clear fireworks, particles, pop text, shake */
     let parts = [], pops = [], flyers = [], shake = 0, balloon = null, balloonT = 3 + Math.random()*3, mega = 0, roundShots = 0, nextT = 0, banner = null, bannerT = 0, lastT = -1;
