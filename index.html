@@ -2266,6 +2266,13 @@ const GAMES = {
     sk = Object.assign({}, sk, { attacker:"🧟", castle:"#a8743f", top:"#c8402a", bolt:"#9be04a", bg:"#3f8a34" });
     const ROWS = 5, COLS = 10, RH = 60, Y0 = 58, X0 = 70, CW = 58, BAR = 374, STREET = X0 + COLS * CW;
     const rowY = r => Y0 + r * RH + RH/2, colX = c => X0 + c * CW + CW/2;
+    const greyCache = {};
+    const greyZ = (size) => { const k = Math.round(size); if(greyCache[k]) return greyCache[k];
+      const c2 = document.createElement("canvas"), S2 = Math.ceil(k * 1.4); c2.width = c2.height = S2; const g2 = c2.getContext("2d");
+      emoji(g2, "🧟", S2 / 2, S2 / 2, k);
+      try{ const im = g2.getImageData(0, 0, S2, S2), d = im.data; for(let i = 0; i < d.length; i += 4){ const l = .3 * d[i] + .59 * d[i+1] + .11 * d[i+2]; d[i] = l * .95 + 8; d[i+1] = l * .97 + 8; d[i+2] = l + 14; } g2.putImageData(im, 0, 0); }catch(e){}
+      return greyCache[k] = c2; };
+    const drawZ = (ctx, x, y, size) => { const c2 = greyZ(size); ctx.drawImage(c2, x - c2.width / 2, y - c2.height / 2); };
     const ALL_CARDS = [
       { id:"power", e:"🌼", cost:50, cd:7, hp:6 },      /* sun flower: makes ☀️ */
       { id:"shoot", e:"🌵", cost:100, cd:6, hp:6 },     /* spike shooter */
@@ -2303,6 +2310,7 @@ const GAMES = {
     let spawned = 0, beaten = 0;
     const say = (s) => { banner = s; bannerT = 2; };
     const pop = (txt, x, y, col) => pops.push({ txt, x, y, t: 1, col: col || "#ffd34d" });
+    window.__defSet = (e) => { energy = e; CARDS.forEach(c => cd[c.id] = 0); };
     window.__defS = () => ({ energy, orbs, foes, grid, beaten, TOTAL, cd, plows, X0, Y0, CW, RH, BAR, cardX: CARDS.map((c,i) => cardX(i)) });
     const firstFoeAhead = (r, x) => foes.find(f => f.row === r && f.x > x - 10 && f.x < STREET + 30 && !f.dead);
     const hitFoe = (f, d, api, slow) => { f.hp -= d; f.hurt = .12; if(slow) f.slow = 3; if(f.hp <= 0 && !f.dead){ f.dead = true; f.dieT = .8; beaten++; api.sfx("boom", .35); if(Math.random() < .5 || f.type !== "walk") api.coin(f.type === "giant" || f.type === "boss" ? 6 : 1, f.x, rowY(f.row) - 30);
@@ -2351,14 +2359,14 @@ const GAMES = {
         /* defenders */
         for(let r = 0; r < ROWS; r++) for(let c = 0; c < COLS; c++){ const d = grid[r][c]; if(!d) continue; d.pop = Math.max(0, d.pop - dt); d.recoil = Math.max(0, d.recoil - dt); d.glow = Math.max(0, d.glow - dt); d.hit = Math.max(0, (d.hit || 0) - dt);
           if(d.id === "power"){ d.t -= dt; if(d.t < 1) d.glow = 1; if(d.t <= 0){ d.t = 9; orbs.push({ x: colX(c), y: rowY(r) - 26, ty: rowY(r) - 26, life: 8, v: 25, ph: 0, fromTower: true }); pops.push && pops.push({ txt: "+25 ☀️", x: colX(c), y: rowY(r) - 34, t: 1, col: "#ffd34d" }); api.sfx("popup", .4); d.burst = .4; } }
-          if(d.id === "tri"){ d.t -= dt; if(d.t <= 0 && [r - 1, r, r + 1].some(rr => rr >= 0 && rr < ROWS && firstFoeAhead(rr, colX(c)))){ d.t = 1.6; d.recoil = .15; [r - 1, r, r + 1].forEach(rr => { if(rr >= 0 && rr < ROWS) bolts.push({ x: colX(c) + 18, row: rr, tri: true }); }); if(Math.random() < .4) api.sfx("pew", .25); } }
+          if(d.id === "tri"){ d.t -= dt; if(d.t <= 0 && [r - 1, r, r + 1].some(rr => rr >= 0 && rr < ROWS && firstFoeAhead(rr, colX(c)))){ d.t = 1.6; d.recoil = .15; [r - 1, r, r + 1].forEach(rr => { if(rr >= 0 && rr < ROWS) bolts.push({ x: colX(c) + 18, row: rr, tri: true, yOff: (r - rr) * RH }); }); if(Math.random() < .4) api.sfx("pew", .25); } }
           if(d.id === "shoot" || d.id === "ice" || d.id === "double"){ d.t -= dt; if(d.t <= 0 && firstFoeAhead(r, colX(c))){ d.t = 1.4; d.recoil = .15; bolts.push({ x: colX(c) + 18, row: r, ice: d.id === "ice" }); if(d.id === "double") bolts.push({ x: colX(c) - 4, row: r }); if(Math.random() < .4) api.sfx("pew", .2); } }
           if(d.id === "mine"){ if(d.arm > 0) d.arm -= dt; else { const f = foes.find(f => !f.dead && f.row === r && Math.abs(f.x - colX(c)) < 26 && !f.jy);
               if(f){ grid[r][c] = null; booms.push({ x: colX(c), y: rowY(r), t: .5, small: true }); shake = .25; api.sfx("boom", .8); foes.forEach(g => { if(g.row === r && Math.abs(g.x - colX(c)) < CW * .9) hitFoe(g, 30, api); }); } } }
           if(d.id === "bomb"){ d.fuse -= dt; if(d.fuse <= 0){ grid[r][c] = null; booms.push({ x: colX(c), y: rowY(r), t: .6 }); flash = .3; shake = .5; api.sfx("boom", .9);
             foes.forEach(f => { if(Math.abs(f.row - r) <= 1 && Math.abs(f.x - colX(c)) < CW * 1.6) hitFoe(f, 40, api); }); } }
         }
-        bolts.forEach(b => { b.x += 330 * dt; const f = foes.find(f => !f.dead && f.row === b.row && Math.abs(f.x - b.x) < 18 && f.jy < 10); if(f){ b.dead = true; hitFoe(f, 1, api, b.ice); for(let i = 0; i < 3; i++) crumbs.push({ x: b.x, y: rowY(b.row) + 4, vx: (Math.random()-.5)*120, vy: -Math.random()*120, t: .3, col: b.ice ? "#bfe9ff" : sk.bolt }); } });
+        bolts.forEach(b => { b.x += 330 * dt; if(b.yOff) b.yOff = Math.abs(b.yOff) < 2 ? 0 : b.yOff - Math.sign(b.yOff) * Math.min(Math.abs(b.yOff), 420 * dt); const f = foes.find(f => !f.dead && f.row === b.row && Math.abs(f.x - b.x) < 18 && f.jy < 10); if(f){ b.dead = true; hitFoe(f, 1, api, b.ice); for(let i = 0; i < 3; i++) crumbs.push({ x: b.x, y: rowY(b.row) + 4, vx: (Math.random()-.5)*120, vy: -Math.random()*120, t: .3, col: b.ice ? "#bfe9ff" : sk.bolt }); } });
         bolts = bolts.filter(b => !b.dead && b.x < LW + 20);
         foes.forEach(f => { if(f.dead){ f.dieT -= dt; return; } f.hurt = Math.max(0, f.hurt - dt); f.slow = Math.max(0, f.slow - dt); f.ph += dt * (f.slow ? 4 : 8);
           const spd = f.sp * (f.slow ? .5 : 1);
@@ -2416,7 +2424,7 @@ const GAMES = {
             if(d.hp < d.max * .6){ ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(-8, -14); ctx.lineTo(0, -2); ctx.lineTo(-4, 8); if(d.hp < d.max * .3){ ctx.moveTo(10, -12); ctx.lineTo(4, 4); } ctx.stroke(); } }
           ctx.restore();
           if(d.hp < d.max && d.id !== "bomb" && d.id !== "mine"){ ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(x - 20, y + 24, 40, 4); ctx.fillStyle = "#3fd34a"; ctx.fillRect(x - 20, y + 24, 40 * d.hp / d.max, 4); } }
-        bolts.forEach(b => { const y = rowY(b.row) - 2; ctx.fillStyle = b.ice ? "#bfe9ff" : sk.bolt; ctx.beginPath(); ctx.arc(b.x, y, 6, 0, 7); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.beginPath(); ctx.arc(b.x + 2, y - 2, 2.5, 0, 7); ctx.fill(); });
+        bolts.forEach(b => { const y = rowY(b.row) - 2 + (b.yOff || 0); ctx.fillStyle = b.ice ? "#bfe9ff" : sk.bolt; ctx.beginPath(); ctx.arc(b.x, y, 6, 0, 7); ctx.fill(); ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.beginPath(); ctx.arc(b.x + 2, y - 2, 2.5, 0, 7); ctx.fill(); });
         foes.slice().sort((a,b) => a.row - b.row).forEach(f => { const y = rowY(f.row) - (f.type === "giant" || f.type === "boss" ? 12 : 2) - f.jy;
           const walk = f.eating ? 0 : Math.sin(f.ph) * 2.5, tilt = f.eating ? Math.sin(t * 14) * .15 : Math.sin(f.ph) * .07;
           ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(f.x, rowY(f.row) + 22, f.size * .4, 5, 0, 0, 7); ctx.fill();
@@ -2426,7 +2434,7 @@ const GAMES = {
           if(f.hurt > 0 && !f.dead && Math.floor(t * 40) % 2) ctx.globalAlpha = .55;
           if(f.type === "fast"){ ctx.strokeStyle = "rgba(255,255,255,.5)"; ctx.lineWidth = 2; for(let k = 0; k < 3; k++){ ctx.beginPath(); ctx.moveTo(18, -8 + k*8); ctx.lineTo(32, -8 + k*8); ctx.stroke(); } }
           if(f.type === "boss" && !f.dead){ ctx.fillStyle = `rgba(255,40,40,${.25 + .15 * Math.sin(t * 8)})`; ctx.beginPath(); ctx.arc(0, 0, f.size * .62, 0, 7); ctx.fill(); }
-          emoji(ctx, sk.attacker, 0, 0, f.size);
+          drawZ(ctx, 0, 0, f.size);
           if(f.type === "boss"){ emoji(ctx, "👑", 0, -50, 34); emoji(ctx, "😠", -f.size * .38, -f.size * .3, 22); }
           if(f.type === "helmet") emoji(ctx, "⛑️", 0, -f.size * .42, 22);
           if(f.type === "tank") emoji(ctx, "🛡️", -16, 6, 26);
@@ -2458,14 +2466,31 @@ const GAMES = {
           ctx.globalAlpha = ok || on ? 1 : .4;
           if(c.id === "double"){ emoji(ctx, "🌵", x - 9, BAR + 28 + lift, 24); emoji(ctx, "🌵", x + 9, BAR + 28 + lift, 24); }
           else emoji(ctx, c.e, x, BAR + 28 + lift, 30);
-          if(c.id === "ice") emoji(ctx, "❄️", x + 15, BAR + 14 + lift, 16);
-          if(c.id === "tri"){ ctx.fillStyle = "#ffd34d"; ctx.font = 'bold 14px Nunito, sans-serif'; ctx.textAlign = "center"; ctx.fillText("x3", x + 20, BAR + 16 + lift); }
+          const badge = { power:"☀️", shoot:"➡️", ice:"❄️", double:"⏩", tri:"🔱", wall:"🛑", mine:"💥", bomb:"💥" }[c.id];
+          if(badge){ ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.beginPath(); ctx.arc(x + CHW - 12, BAR + 16 + lift, 11, 0, 7); ctx.fill(); emoji(ctx, badge, x + CHW - 12, BAR + 16 + lift, c.id === "bomb" ? 18 : 14); }
           ctx.fillStyle = on ? "#1b1b1b" : "#ffd34d"; ctx.font = 'bold 17px Nunito, sans-serif'; ctx.textAlign = "center"; if(!FREE) ctx.fillText(`☀️${c.cost}`, x, BAR + 62 + lift);
           ctx.globalAlpha = 1;
           if(cd[c.id] > 0){ const k = cd[c.id] / c.cd; ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fillRect(x - CHW, BAR + 4, CHW * 2, 64 * Math.min(1, k)); } });
+        /* a little looping cartoon of what the selected plant does */
+        if(sel){ const ci = CARDS.findIndex(k => k.id === sel), bx = Math.max(130, Math.min(LW - 130, cardX(ci))), by = BAR - 70, u = (t % 2.4) / 2.4;
+          ctx.fillStyle = "rgba(255,255,255,.93)"; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(bx - 120, by - 52, 240, 104, 18); else ctx.rect(bx - 120, by - 52, 240, 104); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(cardX(ci) - 10, by + 52); ctx.lineTo(cardX(ci) + 10, by + 52); ctx.lineTo(cardX(ci), by + 66); ctx.fill();
+          const L = bx - 88, R2 = bx + 80, mid = by;
+          const shot = (x0, x1, y, col, k) => { const xx = x0 + (x1 - x0) * k; ctx.fillStyle = col; ctx.beginPath(); ctx.arc(xx, y, 6, 0, 7); ctx.fill(); };
+          if(sel === "power"){ emoji(ctx, "🌼", bx, mid + 10, 40); for(let i = 0; i < 3; i++){ const k = (u + i / 3) % 1; ctx.globalAlpha = 1 - k; emoji(ctx, "☀️", bx + (i - 1) * 30, mid - 10 - k * 40, 24); } ctx.globalAlpha = 1; }
+          else if(sel === "shoot" || sel === "ice" || sel === "double"){ emoji(ctx, "🌵", L, mid, 40); if(sel === "double") emoji(ctx, "🌵", L + 22, mid + 4, 32);
+            const col = sel === "ice" ? "#6ab8ff" : "#6ac83a"; shot(L + 20, R2 - 20, mid, col, u); if(sel === "double") shot(L + 20, R2 - 20, mid, col, (u + .3) % 1);
+            if(sel === "ice"){ ctx.fillStyle = "rgba(120,190,255,.45)"; ctx.beginPath(); ctx.arc(R2, mid, 24, 0, 7); ctx.fill(); }
+            drawZ(ctx, R2 + (u > .9 ? 4 : 0), mid, 40); if(u > .85) emoji(ctx, sel === "ice" ? "❄️" : "💢", R2 + 18, mid - 22, 18); }
+          else if(sel === "tri"){ emoji(ctx, "🌿", L, mid, 40); [-32, 0, 32].forEach((dy, i) => { const k = u; shot(L + 20, R2 - 20, mid + dy * Math.min(1, k * 3), "#6ac83a", k); drawZ(ctx, R2, mid + dy, 26); }); }
+          else if(sel === "wall"){ emoji(ctx, "🎃", bx - 10, mid, 46); const bite = Math.sin(t * 14) * 3; drawZ(ctx, bx + 36 + bite, mid, 40); emoji(ctx, "🛑", bx - 60, mid, 28); if(Math.sin(t * 14) > .5) emoji(ctx, "💬", bx + 18, mid - 28, 16); }
+          else if(sel === "mine"){ emoji(ctx, "🍄", bx - 20, mid + 14, 30); const zx = R2 - (R2 - bx + 10) * Math.min(1, u * 1.6); if(u < .62) drawZ(ctx, zx, mid, 40); else { ctx.globalAlpha = 1 - (u - .62) / .38; emoji(ctx, "💥", bx - 20, mid, 60 + (u - .62) * 60); ctx.globalAlpha = 1; } }
+          else if(sel === "bomb"){ const boom = u > .55; [[-60,-26],[60,-26],[-60,26],[60,26]].forEach(([dx, dy]) => { if(!boom) drawZ(ctx, bx + dx, mid + dy, 26); });
+            if(!boom){ ctx.save(); ctx.translate(bx, mid); const k = 1 + u * .6 + Math.sin(t * 30) * .05; ctx.scale(k, k); emoji(ctx, "🌶️", 0, 0, 34); ctx.restore(); }
+            else { ctx.globalAlpha = 1 - (u - .55) / .45; ctx.fillStyle = "rgba(255,160,60,.6)"; ctx.beginPath(); ctx.arc(bx, mid, 30 + (u - .55) * 160, 0, 7); ctx.fill(); emoji(ctx, "💥", bx, mid, 70); ctx.globalAlpha = 1; } } }
         /* wave meter: flags mark the big waves */
         const mx = LW - 216, mw = 200; ctx.fillStyle = "rgba(0,0,0,.5)"; ctx.fillRect(mx, 14, mw, 14); ctx.fillStyle = "#5fd33a"; ctx.fillRect(mx + mw - mw * (spawned / TOTAL), 16, mw * (spawned / TOTAL), 10);
-        [big1, big2].forEach(i => emoji(ctx, "🚩", mx + mw - mw * (i / TOTAL), 14, 18)); emoji(ctx, sk.attacker, mx + mw - mw * (spawned / TOTAL), 22, 20);
+        [big1, big2].forEach(i => emoji(ctx, "🚩", mx + mw - mw * (i / TOTAL), 14, 18)); drawZ(ctx, mx + mw - mw * (spawned / TOTAL), 22, 20);
         if(boss && !boss.dead){ const bw = 300, bx = LW/2 - bw/2; ctx.fillStyle = "rgba(0,0,0,.6)"; ctx.fillRect(bx, 44, bw, 14); ctx.fillStyle = "#ff3a3a"; ctx.fillRect(bx + 2, 46, (bw - 4) * Math.max(0, boss.hp) / boss.max, 10); emoji(ctx, "👑", bx - 18, 51, 24); }
         if(flash > 0){ ctx.fillStyle = `rgba(255,255,255,${flash})`; ctx.fillRect(0,0,LW,LH); }
         if(bannerT > 0 && banner){ ctx.globalAlpha = Math.min(1, bannerT); ctx.fillStyle = banner.startsWith("⚠") ? "#ff6a4a" : "#ffd34d"; ctx.strokeStyle = "#000"; ctx.lineWidth = 6; ctx.font = '46px "Luckiest Guy", sans-serif'; ctx.textAlign = "center"; ctx.strokeText(banner, LW/2, LH/2 - 20); ctx.fillText(banner, LW/2, LH/2 - 20); ctx.globalAlpha = 1; }
