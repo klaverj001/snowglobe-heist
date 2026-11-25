@@ -605,6 +605,8 @@ function makePlan(bossKey){
   return [act(order[0]), act(order[1]), solo[0], act(order[2]), act(order[3]), solo[1], act(order[4])].concat(END_STEPS);
 }
 let STEPS = [];
+/* the Zombie Garden level has no matching voice line yet: the boss stays quiet there and the pictures explain it */
+function silentStep(st){ try{ return st && st.kind === "action" && THEMES[S.bossKey][st.lv].kind === "defense"; }catch(e){ return false; } }
 function stepLine(st){ if(!st) return "intro"; if(st.kind === "action") return st.own ? "boss" : "lv_" + st.lv; return st.help ? st.id : st.kind; }
 
 function bossLine(id){
@@ -1094,7 +1096,7 @@ function nextStep(){
   S.onMap = false; S.step++; S.sub = {};
   const k = STEPS[S.step] && STEPS[S.step].kind; S.secret = makeSecret(k);
   pushKid(); push({ secret: S.secret ? { step:S.step, kind:S.secret.kind, data:S.secret.data } : null }); render();
-  say(stepLine(STEPS[S.step]));
+  if(silentStep(STEPS[S.step])) sfx("roar", .35); else say(stepLine(STEPS[S.step]));
 }
 function stepDone(){
   chime();
@@ -4615,7 +4617,7 @@ async function askBoss(kind, spoken){
   if(asking) return;
   if(!spoken){
     const st = S.step >= 0 ? STEPS[Math.min(S.step, STEPS.length-1)] : null;
-    if(kind === "help") return say(stepLine(st));
+    if(kind === "help"){ if(silentStep(st)) return; return say(stepLine(st)); }
     if(kind === "joke") return sayAny("joke");
     return say(kind);
   }
